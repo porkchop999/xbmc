@@ -56,6 +56,7 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, TYPE type)
     // built in audio encoder
     if (StringUtils::StartsWithNoCase(info->ID(), "audioencoder.kodi.builtin."))
       return std::make_shared<CAddonDll>(info, type);
+
   }
 
   switch (type)
@@ -71,6 +72,8 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, TYPE type)
     return std::make_shared<CAddonDll>(info, type);
   case ADDON_PVRDLL:
     return std::make_shared<PVR::CPVRClient>(info);
+  case ADDON_SHADERDLL:
+    return std::make_shared<CAddonDll>(info);
   case ADDON_GAMEDLL:
     return std::make_shared<GAME::CGameClient>(info);
   case ADDON_PLUGIN:
@@ -116,5 +119,4 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, TYPE type)
   }
   return AddonPtr();
 }
-
 }
