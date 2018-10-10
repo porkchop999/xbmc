@@ -60,6 +60,11 @@ public:
   static uint32_t FourCCWithoutAlpha(uint32_t fourcc);
   static std::string FourCCToString(uint32_t fourcc);
 
+  bool SupportsAsync() const { return m_supportsAsync; }
+  void SetInFenceFd(int fd) { m_inFenceFd = fd; }
+  void SetOutFenceFd(int fd) { m_outFenceFd = fd; }
+  int& GetOutFenceFd() { return m_outFenceFd; }
+
 protected:
   bool OpenDrm(bool needConnector);
   drm_fb* DrmFbGetFromBo(struct gbm_bo *bo);
@@ -75,6 +80,10 @@ protected:
 
   int m_width = 0;
   int m_height = 0;
+
+  bool m_supportsAsync{false};
+  int m_inFenceFd{-1};
+  int m_outFenceFd{-1};
 
   std::vector<std::unique_ptr<CDRMPlane>> m_planes;
 

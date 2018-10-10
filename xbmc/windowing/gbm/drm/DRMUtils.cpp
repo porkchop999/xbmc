@@ -397,6 +397,18 @@ bool CDRMUtils::InitDrm()
               __FUNCTION__, strerror(errno));
 #endif
 
+  uint64_t supported{0};
+  ret = drmGetCap(m_fd, DRM_CAP_ASYNC_PAGE_FLIP, &supported);
+  if (ret != 0)
+  {
+    CLog::Log(LOGERROR, "CDRMUtils::{} - failed to query async capability: {}", __FUNCTION__,
+              strerror(errno));
+    return false;
+  }
+
+  m_supportsAsync = static_cast<bool>(supported);
+  CLog::Log(LOGDEBUG, "CDRMUtils::{} - supports async: {}", __FUNCTION__, m_supportsAsync);
+
   auto resources = drmModeGetResources(m_fd);
   if (!resources)
   {

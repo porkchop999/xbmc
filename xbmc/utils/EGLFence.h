@@ -29,13 +29,32 @@ public:
   void DestroyFence();
   bool IsSignaled();
 
+#if defined(EGL_ANDROID_native_fence_sync)
+  void CreateKMSFence(int fd);
+  void CreateGPUFence();
+  EGLint FlushFence();
+  void WaitSyncGPU();
+  void WaitSyncCPU();
+#endif
+
 private:
+  EGLSyncKHR CreateFence(int fd);
+
   EGLDisplay m_display{nullptr};
   EGLSyncKHR m_fence{nullptr};
+
+  EGLSyncKHR m_gpuFence{EGL_NO_SYNC_KHR};
+  EGLSyncKHR m_kmsFence{EGL_NO_SYNC_KHR};
 
   PFNEGLCREATESYNCKHRPROC m_eglCreateSyncKHR{nullptr};
   PFNEGLDESTROYSYNCKHRPROC m_eglDestroySyncKHR{nullptr};
   PFNEGLGETSYNCATTRIBKHRPROC m_eglGetSyncAttribKHR{nullptr};
+
+#if defined(EGL_ANDROID_native_fence_sync)
+  PFNEGLDUPNATIVEFENCEFDANDROIDPROC m_eglDupNativeFenceFDANDROID{nullptr};
+  PFNEGLCLIENTWAITSYNCKHRPROC m_eglClientWaitSyncKHR{nullptr};
+  PFNEGLWAITSYNCKHRPROC m_eglWaitSyncKHR{nullptr};
+#endif
 };
 
 }
