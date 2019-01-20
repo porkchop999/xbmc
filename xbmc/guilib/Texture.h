@@ -16,6 +16,7 @@ struct COLOR {unsigned char b,g,r,x;};	// Windows GDI expects 4bytes per color
 #pragma pack()
 
 class CTexture;
+class CGBMTexture;
 class CGLTexture;
 class CPiTexture;
 class CDXTexture;
@@ -81,7 +82,7 @@ public:
   virtual void BindToUnit(unsigned int unit) = 0;
 
   unsigned char* GetPixels() const { return m_pixels; }
-  unsigned int GetPitch() const { return GetPitch(m_textureWidth); }
+  virtual unsigned int GetPitch() const { return GetPitch(m_textureWidth); }
   unsigned int GetRows() const { return GetRows(m_textureHeight); }
   unsigned int GetTextureWidth() const { return m_textureWidth; }
   unsigned int GetTextureHeight() const { return m_textureHeight; }
@@ -99,6 +100,8 @@ public:
   void Allocate(unsigned int width, unsigned int height, unsigned int format);
   void ClampToEdge();
 
+  virtual void GetMemory();
+
   static unsigned int PadPow2(unsigned int x);
   static bool SwapBlueRed(unsigned char *pixels, unsigned int height, unsigned int pitch, unsigned int elements = 4, unsigned int offset=0);
 
@@ -112,6 +115,7 @@ protected:
   bool LoadFromFileInternal(const std::string& texturePath, unsigned int maxWidth, unsigned int maxHeight, bool requirePixels, const std::string& strMimeType = "");
   bool LoadIImage(IImage* pImage, unsigned char* buffer, unsigned int bufSize, unsigned int width, unsigned int height);
   // helpers for computation of texture parameters for compressed textures
+  virtual unsigned int GetDestPitch() const { return GetPitch(m_textureWidth); }
   unsigned int GetPitch(unsigned int width) const;
   unsigned int GetRows(unsigned int height) const;
   unsigned int GetBlockSize() const;
@@ -133,7 +137,10 @@ protected:
   bool m_bCacheMemory = false;
 };
 
-#if defined(TARGET_RASPBERRY_PI)
+#if defined(HAVE_GBM) && defined(HAS_GBM_BO_MAP)
+#include "TextureGBM.h"
+#define CTexture CGBMTexture
+#elif defined(TARGET_RASPBERRY_PI)
 #include "TexturePi.h"
 #define CTexture CPiTexture
 #elif defined(HAS_GL) || defined(HAS_GLES)
