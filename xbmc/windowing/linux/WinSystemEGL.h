@@ -23,6 +23,13 @@ public:
   CWinSystemEGL(EGLenum platform, std::string const& platformExtension);
   ~CWinSystemEGL() = default;
 
+  bool SupportsDmaBufImportModifiers() { return m_eglContext.SupportsDmaBufImportModifiers(); }
+  bool IsFormatSupported(uint32_t format) { return m_eglContext.IsFormatSupported(format); }
+  std::vector<EGLuint64KHR>* GetModifiersForFormat(uint32_t format)
+  {
+    return m_eglContext.GetModifiersForFormat(format);
+  }
+
   EGLDisplay GetEGLDisplay() const;
   EGLSurface GetEGLSurface() const;
   EGLContext GetEGLContext() const;

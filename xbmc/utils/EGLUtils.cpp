@@ -287,6 +287,12 @@ bool CEGLContextUtils::InitializeDisplay(EGLint renderingApi)
   value = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
   CLog::Log(LOGNOTICE, "EGL_CLIENT_EXTENSIONS = %s", value ? value : "NULL");
 
+  if (CEGLUtils::HasExtension(m_eglDisplay, "EGL_EXT_image_dma_buf_import_modifiers"))
+  {
+    m_supportsDmaBufImportModifiers = true;
+    QueryFormats();
+  }
+
   if (eglBindAPI(renderingApi) != EGL_TRUE)
   {
     CEGLUtils::Log(LOGERROR, "failed to bind EGL API");
@@ -612,4 +618,91 @@ bool CEGLContextUtils::TrySwapBuffers()
   }
 
   return (eglSwapBuffers(m_eglDisplay, m_eglSurface) == EGL_TRUE);
+}
+
+bool CEGLContextUtils::QueryFormats()
+{
+#if defined(EGL_EXT_image_dma_buf_import_modifiers)
+  auto eglQueryDmaBufFormatsEXT =
+      CEGLUtils::GetRequiredProcAddress<PFNEGLQUERYDMABUFFORMATSEXTPROC>(
+          "eglQueryDmaBufFormatsEXT");
+
+  EGLint numFormats;
+  if (eglQueryDmaBufFormatsEXT(m_eglDisplay, 0, nullptr, &numFormats) != EGL_TRUE)
+  {
+    CEGLUtils::Log(LOGERROR, "failed to query the max number of EGL DMA BUF formats");
+    return false;
+  }
+
+  std::vector<EGLint> formats(numFormats);
+
+  if (eglQueryDmaBufFormatsEXT(m_eglDisplay, numFormats, formats.data(), &numFormats) != EGL_TRUE)
+  {
+    CEGLUtils::Log(LOGERROR, "failed to query EGL DMA BUF formats");
+    return false;
+  }
+
+  m_modifiers.clear();
+
+  CLog::LogF(LOGDEBUG, "supported EGL image formats:");
+
+  for (const auto& format : formats)
+  {
+    CLog::LogF(LOGDEBUG, "\t{}", FourCCToString(format));
+
+    if (!QueryModifiersForFormat(format))
+    {
+      return false;
+    }
+  }
+
+#endif
+  return true;
+}
+
+bool CEGLContextUtils::QueryModifiersForFormat(EGLint format)
+{
+#if defined(EGL_EXT_image_dma_buf_import_modifiers)
+  auto eglQueryDmaBufModifiersEXT =
+      CEGLUtils::GetRequiredProcAddress<PFNEGLQUERYDMABUFMODIFIERSEXTPROC>(
+          "eglQueryDmaBufModifiersEXT");
+
+  EGLint numFormats;
+  if (eglQueryDmaBufModifiersEXT(m_eglDisplay, format, 0, nullptr, nullptr, &numFormats) !=
+      EGL_TRUE)
+  {
+    CEGLUtils::Log(LOGERROR, "failed to query the max number of EGL DMA BUF format modifiers");
+    return false;
+  }
+
+  std::vector<EGLuint64KHR> modifiers(numFormats);
+
+  if (eglQueryDmaBufModifiersEXT(m_eglDisplay, format, numFormats, modifiers.data(), nullptr,
+                                 &numFormats) != EGL_TRUE)
+  {
+    CEGLUtils::Log(LOGERROR, "failed to query EGL DMA BUF format modifiers");
+    return false;
+  }
+
+  CLog::LogF(LOGDEBUG, "supported EGL image format modifiers:");
+  for (const auto& modifier : modifiers)
+  {
+    CLog::LogF(LOGDEBUG, "\t{:#x}", modifier);
+  }
+
+  m_modifiers.emplace(format, modifiers);
+
+#endif
+  return true;
+}
+
+std::string CEGLContextUtils::FourCCToString(uint32_t fourcc)
+{
+  std::stringstream cout;
+  cout << static_cast<char>(fourcc & 0x000000FF);
+  cout << static_cast<char>((fourcc & 0x0000FF00) >> 8);
+  cout << static_cast<char>((fourcc & 0x00FF0000) >> 16);
+  cout << static_cast<char>((fourcc & 0xFF000000) >> 24);
+
+  return cout.str();
 }

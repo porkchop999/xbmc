@@ -9,12 +9,16 @@
 #pragma once
 
 #include <array>
+#include <map>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 #include <EGL/egl.h>
+//#include <EGL/eglext.h>
+
+typedef khronos_uint64_t EGLuint64KHR;
 
 class CEGLUtils
 {
@@ -202,6 +206,10 @@ public:
   bool IsPlatformSupported() const;
   EGLint GetConfigAttrib(EGLint attribute) const;
 
+  bool SupportsDmaBufImportModifiers() { return m_supportsDmaBufImportModifiers; }
+  bool IsFormatSupported(uint32_t format) { return m_modifiers.find(format) != m_modifiers.end(); }
+  std::vector<EGLuint64KHR>* GetModifiersForFormat(uint32_t format) { return &m_modifiers[format]; }
+
   EGLDisplay GetEGLDisplay() const
   {
     return m_eglDisplay;
@@ -221,6 +229,11 @@ public:
 
 private:
   void SurfaceAttrib();
+  bool QueryFormats();
+  bool QueryModifiersForFormat(EGLint format);
+  std::string FourCCToString(uint32_t fourcc);
+
+  bool m_supportsDmaBufImportModifiers{false};
 
   EGLenum m_platform{EGL_NONE};
   bool m_platformSupported{false};
@@ -229,4 +242,6 @@ private:
   EGLSurface m_eglSurface{EGL_NO_SURFACE};
   EGLContext m_eglContext{EGL_NO_CONTEXT};
   EGLConfig m_eglConfig{}, m_eglHDRConfig{};
+
+  std::map<EGLint, std::vector<EGLuint64KHR>> m_modifiers;
 };

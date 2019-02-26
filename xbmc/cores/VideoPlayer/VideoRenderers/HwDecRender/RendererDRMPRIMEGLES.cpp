@@ -29,8 +29,34 @@ CRendererDRMPRIMEGLES::~CRendererDRMPRIMEGLES()
 
 CBaseRenderer* CRendererDRMPRIMEGLES::Create(CVideoBuffer* buffer)
 {
-  if (buffer && dynamic_cast<CVideoBufferDRMPRIME*>(buffer))
+  if (buffer)
+  {
+    auto winSystemEGL =
+        dynamic_cast<KODI::WINDOWING::LINUX::CWinSystemEGL*>(CServiceBroker::GetWinSystem());
+    if (!winSystemEGL)
+      return nullptr;
+
+    if (winSystemEGL->SupportsDmaBufImportModifiers())
+    {
+      auto buf = static_cast<CVideoBufferDRMPRIME*>(buffer);
+      if (!buf)
+        return nullptr;
+
+      if (!buf->AcquireDescriptor())
+        return nullptr;
+
+      auto desc = buf->GetDescriptor();
+      if (!desc)
+        return nullptr;
+
+      if (!winSystemEGL->IsFormatSupported(desc->format))
+        return nullptr;
+
+      buf->ReleaseDescriptor();
+    }
+
     return new CRendererDRMPRIMEGLES();
+  }
 
   return nullptr;
 }
