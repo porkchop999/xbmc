@@ -16,3 +16,4 @@ xbmc/platform/win32/utils              platform/win32/utils
 xbmc/rendering/dx                      rendering/dx
 xbmc/threads/platform/win              threads/win
 xbmc/windowing/windows                 windowing/windows
+xbmc/cores/RetroPlayer/shaders/windows cores/RetroPlayer/shaders/windows
