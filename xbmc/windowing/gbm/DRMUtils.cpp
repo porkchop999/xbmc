@@ -10,6 +10,7 @@
 
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/EDIDUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
@@ -604,6 +605,9 @@ bool CDRMUtils::InitDrm()
       return false;
     }
 
+    auto edid = GetEDID();
+    edid->LogInfo();
+
     if(!FindEncoder())
     {
       return false;
@@ -840,4 +844,39 @@ bool CDRMUtils::CheckConnector(int connector_id)
   drmModeFreeConnector(connectorcheck.connector);
 
   return finalConnectionState == DRM_MODE_CONNECTED;
+}
+
+std::unique_ptr<KODI::UTILS::CEDIDUtils> CDRMUtils::GetEDID()
+{
+  uint64_t blob_id = 0;
+
+  for (uint32_t i = 0; i < m_connector->props->count_props; i++)
+  {
+    if (strcmp(m_connector->props_info[i]->name, "EDID") == 0)
+      blob_id = m_connector->props->prop_values[i];
+  }
+
+  if (blob_id == 0)
+  {
+    CLog::Log(LOGDEBUG, "CDRMUtils::{} - failed to find EDID property for connector: {}",
+              __FUNCTION__, m_connector->connector->connector_id);
+    return nullptr;
+  }
+
+  auto blob = drmModeGetPropertyBlob(m_fd, blob_id);
+  if (!blob)
+  {
+    CLog::Log(LOGDEBUG, "CDRMUtils::{} - failed get property blob for property id: {} - {} ({})",
+              __FUNCTION__, blob_id, strerror(errno), errno);
+    return nullptr;
+  }
+
+  auto data = static_cast<uint8_t*>(blob->data);
+  auto length = blob->length;
+
+  auto edid = std::vector<uint8_t>(data, data + length);
+
+  drmModeFreePropertyBlob(blob);
+
+  return std::make_unique<KODI::UTILS::CEDIDUtils>(edid);
 }
