@@ -45,6 +45,10 @@ struct hdr_output_metadata
 
 namespace KODI
 {
+namespace UTILS
+{
+class CEDIDUtils;
+}
 namespace WINDOWING
 {
 namespace GBM
@@ -69,6 +73,7 @@ public:
 
 protected:
   std::shared_ptr<KODI::WINDOWING::GBM::CDRMUtils> m_DRM;
+  std::unique_ptr<KODI::UTILS::CEDIDUtils> m_edid;
 
 private:
   void Acquire(CVideoBufferDRMPRIME* buffer);

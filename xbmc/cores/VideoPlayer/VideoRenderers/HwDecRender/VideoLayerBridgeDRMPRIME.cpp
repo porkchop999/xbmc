@@ -9,11 +9,17 @@
 #include "VideoLayerBridgeDRMPRIME.h"
 
 #include "cores/VideoPlayer/Buffers/VideoBufferDRMPRIME.h"
+#include "utils/EDIDUtils.h"
 #include "utils/log.h"
 #include "windowing/gbm/DRMUtils.h"
 
 using namespace KODI::WINDOWING::GBM;
 using namespace DRMPRIME;
+
+namespace
+{
+constexpr int DRM_MODE_COLORIMETRY_BT2020_RGB{9};
+}
 
 CVideoLayerBridgeDRMPRIME::CVideoLayerBridgeDRMPRIME(std::shared_ptr<CDRMUtils> drm) : m_DRM(drm)
 {
@@ -184,14 +190,21 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
     m_DRM->AddProperty(plane, "COLOR_RANGE", GetColorRange(picture));
   }
 
+  m_edid.reset();
+  m_edid = m_DRM->GetEDID();
+
   struct connector* connector = m_DRM->GetConnector();
   if (m_DRM->SupportsProperty(connector, "HDR_OUTPUT_METADATA"))
   {
     m_hdr_metadata.metadata_type = HDMI_STATIC_METADATA_TYPE1;
-    m_hdr_metadata.hdmi_metadata_type1 = {
-        .eotf = GetEOTF(picture),
-        .metadata_type = HDMI_STATIC_METADATA_TYPE1,
-    };
+
+    m_hdr_metadata.hdmi_metadata_type1.metadata_type = HDMI_STATIC_METADATA_TYPE1;
+
+    int eotf = GetEOTF(picture);
+    if (!m_edid->SupportsEOTF(eotf))
+      return;
+
+    m_hdr_metadata.hdmi_metadata_type1.eotf = eotf;
 
     if (m_hdr_blob_id)
       drmModeDestroyPropertyBlob(m_DRM->GetFileDescriptor(), m_hdr_blob_id);
@@ -242,8 +255,12 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
 
     if (m_DRM->SupportsProperty(connector, "Colorspace"))
     {
-      CLog::Log(LOGDEBUG, "CVideoLayerBridgeDRMPRIME::{} - Colorspace={}", __FUNCTION__, 9);
-      m_DRM->AddProperty(connector, "Colorspace", 9);
+      if (m_edid->SupportsColorSpace(GetColorEncoding(picture)))
+      {
+        CLog::Log(LOGDEBUG, "CVideoLayerBridgeIntel::{} - Colorspace={}", __FUNCTION__,
+                  DRM_MODE_COLORIMETRY_BT2020_RGB);
+        m_DRM->AddProperty(connector, "Colorspace", DRM_MODE_COLORIMETRY_BT2020_RGB);
+      }
     }
 
     /*
