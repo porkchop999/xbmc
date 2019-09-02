@@ -41,9 +41,11 @@ RenderBufferPoolVector CRendererFactoryOpenGL::CreateBufferPools(CRenderContext 
 CRPRendererOpenGL::CRPRendererOpenGL(const CRenderSettings &renderSettings, CRenderContext &context, std::shared_ptr<IRenderBufferPool> bufferPool) :
   CRPBaseRenderer(renderSettings, context, std::move(bufferPool))
 {
+  // Initialize CRPBaseRenderer
+  m_shaderPreset.reset(new SHADER::CShaderPresetGL(m_context));
+
   // Initialize CRPRendererOpenGL
   m_clearColour = m_context.UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
-  m_shaderPreset.reset(new SHADER::CShaderPresetGL(m_context));
 }
 
 CRPRendererOpenGL::~CRPRendererOpenGL() = default;
@@ -313,15 +315,16 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
     renderTargetTexture->CreateTextureObject();
 
-    auto source = new SHADER::CShaderTextureGL(*sourceTexture);
-    auto target = new SHADER::CShaderTextureGL(*renderTargetTexture);
-    if (!m_shaderPreset->RenderUpdate(destPoints, source, target))
+    SHADER::CShaderTextureGL source(*sourceTexture);
+    SHADER::CShaderTextureGL target(*renderTargetTexture);
+    if (!m_shaderPreset->RenderUpdate(destPoints, &source, &target))
     {
       m_shadersNeedUpdate = false;
       m_bUseShaderPreset = false;
     }
   }
-  else {
+  else
+  {
     m_context.EnableGUIShader(GL_SHADER_METHOD::TEXTURE);
 
     GLubyte colour[4];

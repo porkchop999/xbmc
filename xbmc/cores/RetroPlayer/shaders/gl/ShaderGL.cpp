@@ -8,19 +8,19 @@
 
 #include "ShaderGL.h"
 #include "ShaderTextureGL.h"
-#include "Application.h"
+#include "ShaderUtilsGL.h"
 #include "cores/RetroPlayer/rendering/RenderContext.h"
 #include "cores/RetroPlayer/shaders/IShaderLut.h"
 #include "rendering/gl/RenderSystemGL.h"
 #include "utils/log.h"
 #include "utils/URIUtils.h"
-#include "ShaderUtilsGL.h"
+#include "Application.h"
 
 using namespace KODI;
 using namespace SHADER;
 
 CShaderGL::CShaderGL(RETRO::CRenderContext &context) :
-        m_context(context)
+  m_context(context)
 {
 }
 
@@ -28,7 +28,7 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
         IShaderSampler* sampler, ShaderLutVec luts,
         float2 viewPortSize, unsigned frameCountMod)
 {
-  //TODO:Remove sampler input from IShader.h
+  // TODO:Remove sampler input from IShader.h
   if(shaderPath.empty())
   {
     CLog::Log(LOGERROR, "ShaderGL: Can't load empty shader path");
@@ -45,7 +45,7 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   std::string defineVertex = "#define VERTEX\n";
   std::string defineFragment;
 
-  if (m_shaderParameters.size() == 0)
+  if (m_shaderParameters.empty())
     defineFragment = "#define FRAGMENT\n";
   else
     defineFragment = "#define FRAGMENT\n#define PARAMETER_UNIFORM\n";
@@ -161,7 +161,7 @@ void CShaderGL::PrepareParameters(CPoint *dest, bool isLastPass, uint64_t frameC
     m_VertexCoords[3][0] = -m_outputSize.x / 2;
     m_VertexCoords[3][1] = m_outputSize.y / 2;
   }
-  else  // last pass
+  else // last pass
   {
     // bottom left x,y
     m_VertexCoords[0][0] = dest[3].x - m_outputSize.x / 2;
@@ -243,7 +243,7 @@ void CShaderGL::GetUniformLocs()
   m_MVPMatrixLoc = glGetUniformLocation(m_shaderProgram, "MVPMatrix");
 }
 
-//TODO:Change name of this method in IShader.h to CreateInputs
+// TODO:Change name of this method in IShader.h to CreateInputs
 bool CShaderGL::CreateInputBuffer()
 {
   GetUniformLocs();
@@ -251,7 +251,7 @@ bool CShaderGL::CreateInputBuffer()
   return true;
 }
 
-//TODO:Change name of this method in IShader.h to UpdateInputs
+// TODO:Change name of this method in IShader.h to UpdateInputs
 void CShaderGL::UpdateInputBuffer(uint64_t frameCount)
 {
   glUseProgram(m_shaderProgram);
@@ -290,6 +290,7 @@ void CShaderGL::SetSizes(const float2 &prevSize, const float2 &nextSize)
   m_outputSize = nextSize;
 }
 
-bool CShaderGL::CreateVertexBuffer(unsigned vertCount, unsigned vertSize) {
+bool CShaderGL::CreateVertexBuffer(unsigned vertCount, unsigned vertSize)
+{
   return false;
 }
