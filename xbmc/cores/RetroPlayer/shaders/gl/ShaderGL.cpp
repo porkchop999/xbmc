@@ -63,10 +63,12 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
   GLuint vShader;
   vShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vShader, 1, &vertexShaderSource, NULL);
+  glCompileShader(vShader);
 
   GLuint fShader;
   fShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fShader, 1, &fragmentShaderSource, NULL);
+  glCompileShader(fShader); //TODO: Make this good 
 
   m_shaderProgram = glCreateProgram();
   glAttachShader(m_shaderProgram, vShader);
