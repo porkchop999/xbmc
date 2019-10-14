@@ -282,11 +282,31 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
 
   const uint32_t color = (alpha << 24) | 0xFFFFFF;
 
-  const std::unique_ptr<CGLTexture> sourceTexture(new CGLTexture(
-          static_cast<unsigned int>(renderBuffer->GetWidth()),
-          static_cast<unsigned int>(renderBuffer->GetHeight()),
-          GL_RGB,
-          renderBuffer->TextureID()));
+  RenderBufferTextures *rbTextures;
+  const auto it = m_RBTexturesMap.find(renderBuffer);
+  if (it != m_RBTexturesMap.end())
+  {
+    rbTextures = it->second.get();
+  } else {
+    // We can't copy or move CGLTexture, so construct source/target in-place
+    rbTextures = new RenderBufferTextures{
+      {   // source texture
+        static_cast<unsigned int>(renderBuffer->GetWidth()),
+        static_cast<unsigned int>(renderBuffer->GetHeight()),
+        GL_RGB,
+        renderBuffer->TextureID()
+      },
+      {
+        // target texture
+        static_cast<unsigned int>(m_context.GetScreenWidth()),
+        static_cast<unsigned int>(m_context.GetScreenHeight())
+      }
+    };
+    m_RBTexturesMap.emplace(renderBuffer, rbTextures);
+  }
+
+  const auto sourceTexture = &rbTextures->source;
+  const auto targetTexture = &rbTextures->target;
 
   glBindTexture(m_textureTarget, sourceTexture->getMTexture());
 
@@ -309,14 +329,10 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
             m_rotatedDestCoords[3]
     };
 
-    const std::unique_ptr<CGLTexture> renderTargetTexture(new CGLTexture(
-            static_cast<unsigned int>(m_context.GetScreenWidth()),
-            static_cast<unsigned int>(m_context.GetScreenHeight())));
-
-    renderTargetTexture->CreateTextureObject();
+    targetTexture->CreateTextureObject();
 
     SHADER::CShaderTextureGL source(*sourceTexture);
-    SHADER::CShaderTextureGL target(*renderTargetTexture);
+    SHADER::CShaderTextureGL target(*targetTexture);
     if (!m_shaderPreset->RenderUpdate(destPoints, &source, &target))
     {
       m_shadersNeedUpdate = false;
