@@ -29,7 +29,7 @@ bool CShaderGL::Create(const std::string& shaderSource, const std::string& shade
         float2 viewPortSize, unsigned frameCountMod)
 {
   // TODO:Remove sampler input from IShader.h
-  if(shaderPath.empty())
+  if (shaderPath.empty())
   {
     CLog::Log(LOGERROR, "ShaderGL: Can't load empty shader path");
     return false;

@@ -37,6 +37,7 @@ CShaderPresetGL::CShaderPresetGL(RETRO::CRenderContext &context, unsigned int vi
 CShaderPresetGL::~CShaderPresetGL()
 {
   DisposeShaders();
+
   // The gui is going to render after this, so apply the state required
   m_context.ApplyStateBlock();
 }
@@ -55,11 +56,15 @@ ShaderParameterMap CShaderPresetGL::GetShaderParameters(const std::vector<Shader
   }
 
   ShaderParameterMap matchParams;
-  for (const auto& match : validParams)   // for each param found in the source code
+
+  // For each param found in the source code
+  for (const auto& match : validParams)
   {
-    for (const auto& parameter : parameters)   // for each param found in the preset file
+    // For each param found in the preset file
+    for (const auto& parameter : parameters)
     {
-      if (match == parameter.strId)  // if they match
+      // Check if they match
+      if (match == parameter.strId)
       {
         // The add-on has already handled parsing and overwriting default
         // parameter values from the preset file. The final value we
@@ -131,6 +136,7 @@ bool CShaderPresetGL::RenderUpdate(const CPoint *dest, IShaderTexture *source, I
       RenderShader(shader, prevTexture, target); // The target on each call is only used for setting the viewport
       texture->UnbindFBO();
     }
+
     // TODO: Remove last texture, useless
     // Apply last pass
     CShaderTextureGL* secToLastTexture = m_pShaderTextures[m_pShaderTextures.size() - 2].get();
@@ -164,7 +170,8 @@ bool CShaderPresetGL::Update()
     if (m_presetPath.empty())
       return false;
 
-    if (!ReadPresetFile(m_presetPath)) {
+    if (!ReadPresetFile(m_presetPath))
+    {
       CLog::Log(LOGERROR, "%s - couldn't load shader preset %s or the shaders it references", __func__, m_presetPath.c_str());
       return false;
     }
@@ -310,7 +317,6 @@ bool CShaderPresetGL::CreateShaderTextures()
     m_pShaders[shaderIdx]->SetSizes(prevSize, scaledSize);
 
     prevSize = scaledSize;
-
   }
   return true;
 }
@@ -319,6 +325,7 @@ bool CShaderPresetGL::CreateShaders()
 {
   auto numPasses = m_passes.size();
   m_textureSize = CShaderUtils::GetOptimalTextureSize(m_videoSize);
+
   ShaderLutVec passLUTsGL;
   for (unsigned shaderIdx = 0; shaderIdx < numPasses; ++shaderIdx)
   {
@@ -354,9 +361,8 @@ bool CShaderPresetGL::CreateShaders()
 bool CShaderPresetGL::CreateBuffers()
 {
   for (auto& videoShader : m_pShaders)
-  {
     videoShader->CreateInputBuffer();
-  }
+
   return true;
 }
 

@@ -16,22 +16,24 @@ using namespace SHADER;
 
 GLint CShaderUtilsGL::TranslateWrapType(WRAP_TYPE wrap)
 {
-GLint glWrap;
-switch(wrap)
-{
-  case WRAP_TYPE_EDGE:
-    glWrap = GL_CLAMP_TO_EDGE;
-    break;
-  case WRAP_TYPE_REPEAT:
-    glWrap = GL_REPEAT;
-    break;
-  case WRAP_TYPE_MIRRORED_REPEAT:
-    glWrap = GL_MIRRORED_REPEAT;
-    break;
-  case WRAP_TYPE_BORDER:
-  default:
-    glWrap = GL_CLAMP_TO_BORDER;
+  GLint glWrap;
+  switch(wrap)
+  {
+    case WRAP_TYPE_EDGE:
+      glWrap = GL_CLAMP_TO_EDGE;
+      break;
+    case WRAP_TYPE_REPEAT:
+      glWrap = GL_REPEAT;
+      break;
+    case WRAP_TYPE_MIRRORED_REPEAT:
+      glWrap = GL_MIRRORED_REPEAT;
+      break;
+    case WRAP_TYPE_BORDER:
+    default:
+      glWrap = GL_CLAMP_TO_BORDER;
+      break;
   }
+
   return glWrap;
 }
 
@@ -39,6 +41,7 @@ void CShaderUtilsGL::MoveVersionToFirstLine(std::string &source, std::string &de
 {
   std::istringstream str_stream(source);
   source.clear();
+
   std::string line;
   bool firstLine = true;
   while (std::getline(str_stream, line))
