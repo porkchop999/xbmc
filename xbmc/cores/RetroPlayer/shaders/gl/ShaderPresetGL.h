@@ -13,9 +13,9 @@
 #include "cores/RetroPlayer/shaders/IShaderPreset.h"
 #include "cores/RetroPlayer/shaders/ShaderTypes.h"
 #include "games/GameServices.h"
+#include "system_gl.h"
 #include "utils/Geometry.h"
 
-#include <GL/gl.h>
 #include <memory>
 #include <string>
 #include <vector>

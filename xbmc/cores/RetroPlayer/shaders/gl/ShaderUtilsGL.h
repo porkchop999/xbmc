@@ -9,8 +9,7 @@
 #pragma once
 
 #include "cores/RetroPlayer/shaders/ShaderTypes.h"
-
-#include <GL/gl.h>
+#include "system_gl.h"
 
 namespace KODI
 {

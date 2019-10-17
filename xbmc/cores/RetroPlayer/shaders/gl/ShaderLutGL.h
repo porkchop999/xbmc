@@ -11,8 +11,8 @@
 
 #include "cores/RetroPlayer/shaders/IShaderLut.h"
 #include "cores/RetroPlayer/shaders/ShaderTypes.h"
+#include "system_gl.h"
 
-#include <GL/gl.h>
 #include <memory>
 #include <string>
 
