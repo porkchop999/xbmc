@@ -15,6 +15,7 @@
 #include "system_gl.h"
 
 #include <map>
+#include <memory>
 
 namespace KODI
 {
