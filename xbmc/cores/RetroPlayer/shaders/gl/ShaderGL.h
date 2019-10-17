@@ -14,6 +14,7 @@
 #include "guilib/TextureGL.h"
 #include "rendering/gl/GLShader.h"
 
+#include <array>
 #include <stdint.h>
 
 namespace KODI
