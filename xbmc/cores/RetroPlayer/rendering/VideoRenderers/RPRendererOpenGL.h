@@ -24,7 +24,6 @@ namespace RETRO
   class CRenderContext;
   class CRenderBufferOpenGL;
 
-
   class CRendererFactoryOpenGL : public IRendererFactory
   {
   public:

@@ -287,7 +287,9 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
   if (it != m_RBTexturesMap.end())
   {
     rbTextures = it->second.get();
-  } else {
+  }
+  else
+  {
     // We can't copy or move CGLTexture, so construct source/target in-place
     rbTextures = new RenderBufferTextures{
       {   // source texture
@@ -313,6 +315,7 @@ void CRPRendererOpenGL::Render(uint8_t alpha)
   GLint filter = GL_NEAREST;
   if (GetRenderSettings().VideoSettings().GetScalingMethod() == SCALINGMETHOD::LINEAR)
     filter = GL_LINEAR;
+
   glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, filter);
   glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, filter);
   glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
