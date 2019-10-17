@@ -1,13 +1,16 @@
-set(SOURCES ShaderTextureGL.cpp
-        ShaderUtilsGL.cpp
-        ShaderPresetGL.cpp
-        ShaderLutGL.cpp
-        ShaderGL.cpp)
+set(SOURCES ShaderGL.cpp
+            ShaderLutGL.cpp
+            ShaderPresetGL.cpp
+            ShaderTextureGL.cpp
+            ShaderUtilsGL.cpp
+)
 
-set(HEADERS ShaderTextureGL.h
-        ShaderUtilsGL.h
-        ShaderLutGL.h
-        ShaderGL.h
-        ShaderTypesGL.h)
+set(HEADERS ShaderGL.h
+            ShaderLutGL.h
+            ShaderPresetGL.h
+            ShaderTextureGL.h
+            ShaderTypesGL.h
+            ShaderUtilsGL.h
+)
 
 core_add_library(rp-shaders-gl)
