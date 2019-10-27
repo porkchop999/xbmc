@@ -149,6 +149,7 @@ set(optional_deps Alsa
                   Plist
                   PulseAudio
                   Python
+                  Ruby
                   SmbClient
                   Sndio
                   UDEV

@@ -24,6 +24,7 @@
 #include "input/InputManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "interfaces/python/XBPython.h"
+#include "interfaces/ruby/RubyInterface.h"
 #include "network/Network.h"
 #include "peripherals/Peripherals.h"
 #include "powermanagement/PowerManager.h"
@@ -90,6 +91,9 @@ bool CServiceManager::InitStageOne()
   m_XBPython.reset(new XBPython());
   CScriptInvocationManager::GetInstance().RegisterLanguageInvocationHandler(m_XBPython.get(), ".py");
 #endif
+
+  m_ruby.reset(new RUBY::CRubyInterface);
+  CScriptInvocationManager::GetInstance().RegisterLanguageInvocationHandler(m_ruby.get(), ".rb");
 
   m_playlistPlayer.reset(new PLAYLIST::CPlayListPlayer());
 
@@ -223,6 +227,10 @@ void CServiceManager::DeinitStageOne()
 
   m_network.reset();
   m_playlistPlayer.reset();
+
+  CScriptInvocationManager::GetInstance().UnregisterLanguageInvocationHandler(m_ruby.get());
+  m_ruby.reset();
+
 #ifdef HAS_PYTHON
   CScriptInvocationManager::GetInstance().UnregisterLanguageInvocationHandler(m_XBPython.get());
   m_XBPython.reset();

@@ -120,8 +120,6 @@ void CScriptInvocationManager::RegisterLanguageInvocationHandler(ILanguageInvoca
   if (m_invocationHandlers.find(ext) != m_invocationHandlers.end())
     return;
 
-  m_invocationHandlers.insert(std::make_pair(extension, invocationHandler));
-
   bool known = false;
   for (const auto& it : m_invocationHandlers)
   {
@@ -131,6 +129,8 @@ void CScriptInvocationManager::RegisterLanguageInvocationHandler(ILanguageInvoca
       break;
     }
   }
+
+  m_invocationHandlers.insert(std::make_pair(extension, invocationHandler));
 
   // automatically initialize the invocation handler if it's a new one
   if (!known)

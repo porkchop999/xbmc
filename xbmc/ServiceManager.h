@@ -24,6 +24,11 @@ namespace ADDON
   class CRepositoryUpdater;
 }
 
+namespace RUBY
+{
+class CRubyInterface;
+}
+
 namespace PVR
 {
   class CPVRManager;
@@ -96,6 +101,9 @@ public:
 #ifdef HAS_PYTHON
   XBPython& GetXBPython();
 #endif
+
+  std::unique_ptr<RUBY::CRubyInterface> m_ruby;
+
   PVR::CPVRManager& GetPVRManager();
   CContextMenuManager& GetContextMenuManager();
   CDataCacheCore& GetDataCacheCore();
