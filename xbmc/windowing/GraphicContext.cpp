@@ -27,6 +27,8 @@
 
 #include <cassert>
 
+#include <cassert>
+
 using namespace KODI::MESSAGING;
 
 CGraphicContext::CGraphicContext(void) = default;
