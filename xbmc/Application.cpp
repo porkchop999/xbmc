@@ -196,6 +196,10 @@
 #include "addons/AddonSystemSettings.h"
 #include "FileItem.h"
 
+#define USE_OS_TZDB 0
+#define HAS_REMOTE_API 0
+#include <date/tz.h>
+
 using namespace ADDON;
 using namespace XFILE;
 #ifdef HAS_DVD_DRIVE
@@ -397,21 +401,20 @@ bool CApplication::Create(const CAppParamParser &params)
   tzset();   // Initialize timezone information variables
 #endif
 
-
-  //! @todo - move to CPlatformXXX
-  #if defined(TARGET_POSIX)
-    // set special://envhome
-    if (getenv("HOME"))
-    {
-      CSpecialProtocol::SetEnvHomePath(getenv("HOME"));
-    }
-    else
-    {
-      fprintf(stderr, "The HOME environment variable is not set!\n");
-      /* Cleanup. Leaving this out would lead to another crash */
-      m_ServiceManager->DeinitStageOne();
-      return false;
-    }
+//! @todo - move to CPlatformXXX
+#if defined(TARGET_POSIX)
+  // set special://envhome
+  if (getenv("HOME"))
+  {
+    CSpecialProtocol::SetEnvHomePath(getenv("HOME"));
+  }
+  else
+  {
+    fprintf(stderr, "The HOME environment variable is not set!\n");
+    /* Cleanup. Leaving this out would lead to another crash */
+    m_ServiceManager->DeinitStageOne();
+    return false;
+  }
   #endif
 
   // copy required files
@@ -591,6 +594,19 @@ bool CApplication::Create(const CAppParamParser &params)
   {
     return false;
   }
+
+  // must be done after stage two when addon manager is initialized
+  AddonPtr addon;
+  if (!CServiceBroker::GetAddonMgr().GetAddon("resource.timezone", addon,
+                                              ADDON::ADDON_RESOURCE_TIMEZONE, true))
+  {
+    CLog::LogF(LOGDEBUG, "failed to find resource.timezone");
+    return false;
+  }
+
+  std::string tzdataPath = URIUtils::AddFileToFolder(addon->Path(), "resources", "tzdata");
+  CLog::LogF(LOGDEBUG, "tzdata path: {}", tzdataPath);
+  date::set_install(tzdataPath);
 
   m_pActiveAE.reset(new ActiveAE::CActiveAE());
   m_pActiveAE->Start();
