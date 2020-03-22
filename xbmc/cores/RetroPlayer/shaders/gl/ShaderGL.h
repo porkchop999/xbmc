@@ -11,6 +11,7 @@
 #include "ShaderTextureGL.h"
 #include "cores/RetroPlayer/shaders/IShader.h"
 #include "cores/RetroPlayer/shaders/gl/ShaderTypesGL.h"
+#include "guilib/Shader.h"
 #include "guilib/TextureGL.h"
 #include "rendering/gl/GLShader.h"
 
@@ -84,7 +85,7 @@ private:
   // Resolution of the texture that holds the input
   //float2 m_textureSize;
 
-  GLuint m_shaderProgram = 0;
+  // GLuint m_shaderProgram = 0;
 
   // Projection matrix
   std::array<std::array<GLfloat, 4>, 4> m_MVP;
@@ -110,6 +111,7 @@ private:
   GLuint VBO[3] = {};
 
 private:
+  Shaders::CGLSLShaderProgram m_shader;
   uniformInputs GetInputData(uint64_t frameCount = 0);
 
   // Construction parameters

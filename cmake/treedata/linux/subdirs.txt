@@ -13,9 +13,5 @@ xbmc/platform/posix                 platform/posix
 xbmc/platform/posix/filesystem      platform/posix/filesystem
 xbmc/platform/posix/network         platform/posix/network
 xbmc/platform/posix/utils           platform/posix/utils
-xbmc/input/touch                    input/touch
-xbmc/input/touch/generic            input/touch/generic
-xbmc/cores/RetroPlayer/process/rbpi cores/RetroPlayer/process/rbpi
 xbmc/cores/RetroPlayer/shaders/gl   cores/RetroPlayer/shaders/gl
-xbmc/cores/VideoPlayer/Process/rbpi cores/VideoPlayer/Process/rbpi
 xbmc/windowing/linux                windowing/linux

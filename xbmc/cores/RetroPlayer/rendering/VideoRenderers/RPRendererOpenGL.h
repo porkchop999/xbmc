@@ -63,7 +63,7 @@ namespace RETRO
         CGLTexture source;
         CGLTexture target;
     };
-    
+
     // implementation of CRPBaseRenderer
     void RenderInternal(bool clear, uint8_t alpha) override;
     void FlushInternal() override;
@@ -91,7 +91,7 @@ namespace RETRO
 
     GLuint m_blackbarsVAO;
     GLuint m_blackbarsVertexVBO;
-    
+
     GLenum m_textureTarget = GL_TEXTURE_2D;
     float m_clearColour = 0.0f;
   };

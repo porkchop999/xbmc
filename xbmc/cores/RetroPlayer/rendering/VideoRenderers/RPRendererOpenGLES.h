@@ -13,6 +13,7 @@
 #include "cores/RetroPlayer/buffers/BaseRenderBufferPool.h"
 #include "cores/RetroPlayer/buffers/video/RenderBufferSysMem.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
+#include "guilib/TextureGL.h"
 
 #include <atomic>
 #include <stdint.h>
@@ -24,15 +25,19 @@ namespace KODI
 {
 namespace RETRO
 {
-  class CRendererFactoryOpenGLES : public IRendererFactory
-  {
-  public:
-    ~CRendererFactoryOpenGLES() override = default;
+class CRenderBufferOpenGLES;
 
-    // implementation of IRendererFactory
-    std::string RenderSystemName() const override;
-    CRPBaseRenderer *CreateRenderer(const CRenderSettings &settings, CRenderContext &context, std::shared_ptr<IRenderBufferPool> bufferPool) override;
-    RenderBufferPoolVector CreateBufferPools(CRenderContext &context) override;
+class CRendererFactoryOpenGLES : public IRendererFactory
+{
+public:
+  ~CRendererFactoryOpenGLES() override = default;
+
+  // implementation of IRendererFactory
+  std::string RenderSystemName() const override;
+  CRPBaseRenderer* CreateRenderer(const CRenderSettings& settings,
+                                  CRenderContext& context,
+                                  std::shared_ptr<IRenderBufferPool> bufferPool) override;
+  RenderBufferPoolVector CreateBufferPools(CRenderContext& context) override;
   };
 
   class CRPRendererOpenGLES : public CRPBaseRenderer
@@ -48,10 +53,27 @@ namespace RETRO
     static bool SupportsScalingMethod(SCALINGMETHOD method);
 
   protected:
+    struct PackedVertex
+    {
+      float x, y, z;
+      float u1, v1;
+    };
+    struct Svertex
+    {
+      float x;
+      float y;
+      float z;
+    };
+    struct RenderBufferTextures
+    {
+      CGLTexture source;
+      CGLTexture target;
+    };
+
     // implementation of CRPBaseRenderer
     void RenderInternal(bool clear, uint8_t alpha) override;
     void FlushInternal() override;
-
+    bool ConfigureInternal() override;
     /*!
      * \brief Set the entire backbuffer to black
      */
@@ -66,6 +88,8 @@ namespace RETRO
     void DrawBlackBars();
 
     virtual void Render(uint8_t alpha);
+
+    std::map<CRenderBufferOpenGLES*, std::unique_ptr<RenderBufferTextures>> m_RBTexturesMap;
 
     GLuint m_mainIndexVBO;
     GLuint m_mainVertexVBO;

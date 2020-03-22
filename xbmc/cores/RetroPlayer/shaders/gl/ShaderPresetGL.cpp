@@ -278,12 +278,20 @@ bool CShaderPresetGL::CreateShaderTextures()
     if (pass.fbo.floatFramebuffer)
     {
       // Give priority to float framebuffer parameter (we can't use both float and sRGB)
+#if defined(HAS_GL)
       textureFormat = GL_RGB32F;
+#elif defined(HAS_GLES)
+      textureFormat = GL_RGB32F_EXT;
+#endif
     }
     else
     {
       if (pass.fbo.sRgbFramebuffer)
+#if defined(HAS_GL)
         textureFormat = GL_SRGB8;
+#elif defined(HAS_GLES)
+        textureFormat = GL_SRGB8_ALPHA8_EXT;
+#endif
       else
         textureFormat = GL_RGBA;
     }
@@ -304,14 +312,26 @@ bool CShaderPresetGL::CreateShaderTextures()
     glBindTexture(GL_TEXTURE_2D, texture->getMTexture());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+#if defined(HAS_GL)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
+#elif defined(HAS_GLES)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER_EXT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER_EXT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R_OES, GL_CLAMP_TO_BORDER_EXT);
+#endif
+#if defined(HAS_GL)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0.0);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MAX_FLOAT);
+#endif
     GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+#if defined(HAS_GL)
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, blackBorder);
+#elif defined(HAS_GLES)
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR_EXT, blackBorder);
+#endif
 
     m_pShaderTextures.emplace_back(new CShaderTextureGL(*texture));
     m_pShaders[shaderIdx]->SetSizes(prevSize, scaledSize);

@@ -250,6 +250,7 @@ CGLSLShaderProgram::CGLSLShaderProgram(const std::string& vert,
   m_pVP->LoadSource(vert);
 }
 
+
 CGLSLShaderProgram::~CGLSLShaderProgram()
 {
   Free();

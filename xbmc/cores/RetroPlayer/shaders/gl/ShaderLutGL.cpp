@@ -60,14 +60,23 @@ std::unique_ptr<IShaderTexture> CShaderLutGL::CreateLUTTexture(RETRO::CRenderCon
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapType);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapType);
+#if defined(HAS_GL)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, wrapType);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
+#elif defined(HAS_GLES)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R_OES, wrapType);
+#endif
+#if defined(HAS_GL)
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0.0);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, MAX_FLOAT);
+#endif
 
   GLfloat blackBorder[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+#if defined(HAS_GL)
   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, blackBorder);
-
+#elif defined(HAS_GLES)
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR_EXT, blackBorder);
+#endif
   if (lut.mipmap)
     texture->SetMipmapping();
 

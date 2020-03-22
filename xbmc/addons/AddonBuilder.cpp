@@ -73,7 +73,7 @@ AddonPtr CAddonBuilder::Generate(const AddonInfoPtr& info, TYPE type)
   case ADDON_PVRDLL:
     return std::make_shared<PVR::CPVRClient>(info);
   case ADDON_SHADERDLL:
-    return std::make_shared<CAddonDll>(info);
+    return std::make_shared<CAddonDll>(info, type);
   case ADDON_GAMEDLL:
     return std::make_shared<GAME::CGameClient>(info);
   case ADDON_PLUGIN:
