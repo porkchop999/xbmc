@@ -30,6 +30,13 @@ extern "C"
 #include <libavutil/pixdesc.h>
 }
 
+namespace
+{
+
+constexpr const char* SETTING_VIDEOPLAYER_USEPRIMEDECODERFORHW{"videoplayer.useprimedecoderforhw"};
+
+} // namespace
+
 CDVDVideoCodecDRMPRIME::CDVDVideoCodecDRMPRIME(CProcessInfo& processInfo)
   : CDVDVideoCodec(processInfo)
 {
@@ -72,6 +79,10 @@ static bool IsSupportedSwFormat(const enum AVPixelFormat fmt)
 
 static const AVCodecHWConfig* FindHWConfig(const AVCodec* codec)
 {
+  if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
+          SETTING_VIDEOPLAYER_USEPRIMEDECODERFORHW))
+    return nullptr;
+
   const AVCodecHWConfig* config = nullptr;
   for (int n = 0; (config = avcodec_get_hw_config(codec, n)); n++)
   {
