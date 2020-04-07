@@ -24,6 +24,8 @@
 #include "windowing/gbm/DRMAtomic.h"
 #include "windowing/gbm/WinSystemGbm.h"
 
+#include <sstream>
+
 using namespace KODI::WINDOWING::GBM;
 
 const std::string SETTING_VIDEOPLAYER_USEPRIMERENDERER = "videoplayer.useprimerenderer";
@@ -31,6 +33,17 @@ const std::string SETTING_VIDEOPLAYER_USEPRIMERENDERER = "videoplayer.useprimere
 CRendererDRMPRIME::~CRendererDRMPRIME()
 {
   Flush(false);
+}
+
+static std::string FourCCToString(uint32_t fourcc)
+{
+  std::stringstream cout;
+  cout << static_cast<char>(fourcc & 0x000000FF);
+  cout << static_cast<char>((fourcc & 0x0000FF00) >> 8);
+  cout << static_cast<char>((fourcc & 0x00FF0000) >> 16);
+  cout << static_cast<char>((fourcc & 0xFF000000) >> 24);
+
+  return cout.str();
 }
 
 CBaseRenderer* CRendererDRMPRIME::Create(CVideoBuffer* buffer)
@@ -65,6 +78,9 @@ CBaseRenderer* CRendererDRMPRIME::Create(CVideoBuffer* buffer)
         std::find(modifiers->begin(), modifiers->end(), desc->objects[0].format_modifier);
     if (modifier == modifiers->end())
       return nullptr;
+
+    CLog::Log(LOGDEBUG, "CRendererDRMPRIME - found plane format={} modifier={:#x}",
+              FourCCToString(desc->format), desc->objects[0].format_modifier);
 
     buf->ReleaseDescriptor();
 
