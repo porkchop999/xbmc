@@ -45,7 +45,7 @@ void CVideoLayerBridgeDRMPRIME::Disable()
     m_DRM->AddProperty(connector, "HDR_OUTPUT_METADATA", 0);
     m_DRM->SetActive(true);
 
-    if (m_DRM->SupportsProperty(connector, "Colorspace"))
+    if (m_DRM->SupportsPropertyWithValue(connector, "Colorspace", 0))
     {
       CLog::Log(LOGDEBUG, "CVideoLayerBridgeDRMPRIME::{} - Colorspace={}", __FUNCTION__, 0);
       m_DRM->AddProperty(connector, "Colorspace", 0);
@@ -252,11 +252,11 @@ void CVideoLayerBridgeDRMPRIME::Configure(CVideoBufferDRMPRIME* buffer)
       }
     }
 
-    if (m_DRM->SupportsProperty(connector, "Colorspace"))
+    if (m_DRM->SupportsPropertyWithValue(connector, "Colorspace", DRM_MODE_COLORIMETRY_BT2020_RGB))
     {
       if (m_edid->SupportsColorSpace(GetColorEncoding(picture)))
       {
-        CLog::Log(LOGDEBUG, "CVideoLayerBridgeIntel::{} - Colorspace={}", __FUNCTION__,
+        CLog::Log(LOGDEBUG, "CVideoLayerBridgeDRMPRIME::{} - Colorspace={}", __FUNCTION__,
                   DRM_MODE_COLORIMETRY_BT2020_RGB);
         m_DRM->AddProperty(connector, "Colorspace", DRM_MODE_COLORIMETRY_BT2020_RGB);
       }
