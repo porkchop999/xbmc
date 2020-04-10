@@ -196,11 +196,29 @@ void CDRMUtils::FreeProperties(struct drm_object *object)
   object->id = 0;
 }
 
-bool CDRMUtils::SupportsProperty(struct drm_object *object, const char *name)
+bool CDRMUtils::SupportsPropertyWithValue(struct drm_object* object,
+                                          const char* name,
+                                          uint64_t value /* = 0 */)
 {
   for (uint32_t i = 0; i < object->props->count_props; i++)
+  {
     if (!strcmp(object->props_info[i]->name, name))
-      return true;
+    {
+      if (drm_property_type_is(object->props_info[i], DRM_MODE_PROP_ENUM) != 0)
+      {
+        for (int j = 0; j < object->props_info[i]->count_enums; j++)
+        {
+          if (object->props_info[i]->enums[j].value == value)
+            return true;
+        }
+      }
+      else if (drm_property_type_is(object->props_info[i], DRM_MODE_PROP_BLOB) != 0)
+      {
+        // no way to verify what a blob accepts
+        return true;
+      }
+    }
+  }
 
   return false;
 }
