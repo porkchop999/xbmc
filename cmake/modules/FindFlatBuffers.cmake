@@ -34,7 +34,7 @@ if(ENABLE_INTERNAL_FLATBUFFERS)
   externalproject_add(flatbuffers
                       URL ${FLATBUFFERS_URL}
                       URL_HASH ${FLATBUFFERS_SHA256}
-                      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                      DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/flatbuffers
                       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
                                  -DCMAKE_BUILD_TYPE=Release

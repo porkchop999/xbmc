@@ -36,7 +36,7 @@ if(ENABLE_INTERNAL_RapidJSON)
   externalproject_add(rapidjson
                       URL ${RapidJSON_URL}
                       URL_HASH ${RAPIDJSON_SHA256}
-                      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                      DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/rapidjson
                       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
                                  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}

@@ -67,6 +67,9 @@ if(CORE_SYSTEM_NAME STREQUAL linux)
   option(ENABLE_EVENTCLIENTS    "Enable event clients support?" OFF)
 endif()
 
+SET(WITH_TARBALLS "${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download" CACHE STRING "location where cmake should save tarballs needed for building")
+message(STATUS "Using tarball location: " ${WITH_TARBALLS})
+
 # Build static libraries per directory
 if(NOT CMAKE_GENERATOR MATCHES "Visual Studio" AND NOT CMAKE_GENERATOR STREQUAL Xcode)
   set(ENABLE_STATIC_LIBS TRUE)

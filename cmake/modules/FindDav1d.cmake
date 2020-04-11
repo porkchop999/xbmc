@@ -58,7 +58,7 @@ if(ENABLE_INTERNAL_DAV1D)
                       URL ${DAV1D_URL}
                       URL_HASH ${DAV1D_SHA256}
                       DOWNLOAD_NAME dav1d-${DAV1D_VER}.tar.gz
-                      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                      DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/dav1d
                       CONFIGURE_COMMAND meson
                                         --buildtype=release

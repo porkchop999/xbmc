@@ -104,7 +104,7 @@ else()
       ExternalProject_Add(dvdcss URL ${LIBDVDCSS_URL}
                                   URL_HASH ${LIBDVDCSS_SHA256}
                                   DOWNLOAD_NAME libdvdcss-${libdvdcss_VER}.tar.gz
-                                  DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                                  DOWNLOAD_DIR ${WITH_TARBALLS}
                                   PREFIX ${CORE_BUILD_DIR}/libdvd
                                   CONFIGURE_COMMAND ac_cv_path_GIT= <SOURCE_DIR>/configure
                                                     --target=${HOST_ARCH}
@@ -147,7 +147,7 @@ else()
     ExternalProject_Add(dvdread URL ${LIBDVDREAD_URL}
                                 URL_HASH ${LIBDVDREAD_SHA256}
                                 DOWNLOAD_NAME libdvdread-${libdvdread_VER}.tar.gz
-                                DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                                DOWNLOAD_DIR ${WITH_TARBALLS}
                                 PREFIX ${CORE_BUILD_DIR}/libdvd
                                 CONFIGURE_COMMAND ac_cv_path_GIT= <SOURCE_DIR>/configure
                                                   --target=${HOST_ARCH}
@@ -192,7 +192,7 @@ else()
     ExternalProject_Add(dvdnav URL ${LIBDVDNAV_URL}
                                 URL_HASH ${LIBDVDNAV_SHA256}
                                 DOWNLOAD_NAME libdvdnav-${libdvdnav_VER}.tar.gz
-                                DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                                DOWNLOAD_DIR ${WITH_TARBALLS}
                                 PREFIX ${CORE_BUILD_DIR}/libdvd
                                 CONFIGURE_COMMAND ac_cv_path_GIT= <SOURCE_DIR>/configure
                                                   --target=${HOST_ARCH}

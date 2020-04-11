@@ -35,7 +35,7 @@ if(ENABLE_INTERNAL_FSTRCMP)
   externalproject_add(fstrcmp
                       URL ${FSTRCMP_URL}
                       URL_HASH ${FSTRCMP_SHA256}
-                      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                      DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/fstrcmp
                       CONFIGURE_COMMAND autoreconf -vif && ./configure --prefix ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
                       BUILD_BYPRODUCTS ${FSTRCMP_LIBRARY}

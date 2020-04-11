@@ -254,7 +254,7 @@ if(NOT FFMPEG_FOUND)
                       URL ${FFMPEG_URL}
                       URL_HASH ${FFMPEG_SHA256}
                       DOWNLOAD_NAME ffmpeg-${FFMPEG_VER}.tar.gz
-                      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/download
+                      DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/ffmpeg
                       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
                                  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
