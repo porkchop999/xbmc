@@ -22,14 +22,14 @@ if(ENABLE_INTERNAL_CROSSGUID)
     set(EXTRA_ARGS "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
   endif()
 
-  set(CROSSGUID_LIBRARY ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/libcrossguid.a)
-  set(CROSSGUID_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/include)
+  set(CROSSGUID_LIBRARY ${DEPENDS_BUILD_DIR}/lib/libcrossguid.a)
+  set(CROSSGUID_INCLUDE_DIR ${DEPENDS_BUILD_DIR}/include)
   externalproject_add(crossguid
                       URL ${CROSSGUID_URL}
                       URL_HASH ${CROSSGUID_SHA256}
                       DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/crossguid
-                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
+                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEPENDS_BUILD_DIR}
                                  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
                                  "${EXTRA_ARGS}"
                       PATCH_COMMAND ${CMAKE_COMMAND} -E copy

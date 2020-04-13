@@ -65,7 +65,7 @@ if(FFMPEG_PATH)
 endif()
 
 # external FFMPEG
-if(NOT ENABLE_INTERNAL_FFMPEG OR KODI_DEPENDSBUILD)
+if(NOT ENABLE_INTERNAL_FFMPEG OR KODI_DEPENDSBUILD OR KODI_CMAKE_DEPENDSBUILD)
   if(FFMPEG_PATH)
     list(APPEND CMAKE_PREFIX_PATH ${FFMPEG_PATH})
   endif()
@@ -256,7 +256,7 @@ if(NOT FFMPEG_FOUND)
                       DOWNLOAD_NAME ffmpeg-${FFMPEG_VER}.tar.gz
                       DOWNLOAD_DIR ${WITH_TARBALLS}
                       PREFIX ${CORE_BUILD_DIR}/ffmpeg
-                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
+                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEPENDS_BUILD_DIR}
                                  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                                  -DFFMPEG_VER=${FFMPEG_VER}
                                  -DCORE_SYSTEM_NAME=${CORE_SYSTEM_NAME}
@@ -271,7 +271,7 @@ if(NOT FFMPEG_FOUND)
                                  -DCMAKE_EXE_LINKER_FLAGS=${LINKER_FLAGS}
                                  ${CROSS_ARGS}
                                  ${FFMPEG_OPTIONS}
-                                 -DPKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig
+                                 -DPKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig
                       PATCH_COMMAND ${CMAKE_COMMAND} -E copy
                                     ${CMAKE_SOURCE_DIR}/tools/depends/target/ffmpeg/CMakeLists.txt
                                     <SOURCE_DIR> &&
@@ -287,27 +287,27 @@ if(NOT FFMPEG_FOUND)
   if(NOT BASH_COMMAND)
     message(FATAL_ERROR "Internal FFmpeg requires bash.")
   endif()
-  file(WRITE ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/ffmpeg/ffmpeg-link-wrapper
+  file(WRITE ${DEPENDS_BUILD_DIR}/ffmpeg/ffmpeg-link-wrapper
 "#!${BASH_COMMAND}
 if [[ $@ == *${APP_NAME_LC}.bin* || $@ == *${APP_NAME_LC}${APP_BINARY_SUFFIX}* || $@ == *${APP_NAME_LC}.so* || $@ == *${APP_NAME_LC}-test* ]]
 then
-  avformat=`PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavcodec`
-  avcodec=`PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavformat`
-  avfilter=`PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavfilter`
-  avutil=`PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavutil`
-  swscale=`PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libswscale`
-  swresample=`PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libswresample`
+  avformat=`PKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavcodec`
+  avcodec=`PKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavformat`
+  avfilter=`PKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavfilter`
+  avutil=`PKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libavutil`
+  swscale=`PKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libswscale`
+  swresample=`PKG_CONFIG_PATH=${DEPENDS_BUILD_DIR}/lib/pkgconfig ${PKG_CONFIG_EXECUTABLE} --libs --static libswresample`
   gnutls=`PKG_CONFIG_PATH=${DEPENDS_PATH}/lib/pkgconfig/ ${PKG_CONFIG_EXECUTABLE}  --libs-only-l --static --silence-errors gnutls`
   $@ $avcodec $avformat $avcodec $avfilter $swscale $swresample -lpostproc $gnutls
 else
   $@
 fi")
-  file(COPY ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/ffmpeg/ffmpeg-link-wrapper
-       DESTINATION ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
+  file(COPY ${DEPENDS_BUILD_DIR}/ffmpeg/ffmpeg-link-wrapper
+       DESTINATION ${DEPENDS_BUILD_DIR}
        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
-  set(FFMPEG_LINK_EXECUTABLE "${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/ffmpeg-link-wrapper <CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>" PARENT_SCOPE)
-  set(FFMPEG_CREATE_SHARED_LIBRARY "${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/ffmpeg-link-wrapper <CMAKE_CXX_COMPILER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>" PARENT_SCOPE)
-  set(FFMPEG_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/include)
+  set(FFMPEG_LINK_EXECUTABLE "${DEPENDS_BUILD_DIR}/ffmpeg-link-wrapper <CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>" PARENT_SCOPE)
+  set(FFMPEG_CREATE_SHARED_LIBRARY "${DEPENDS_BUILD_DIR}/ffmpeg-link-wrapper <CMAKE_CXX_COMPILER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>" PARENT_SCOPE)
+  set(FFMPEG_INCLUDE_DIRS ${DEPENDS_BUILD_DIR}/include)
   list(APPEND FFMPEG_DEFINITIONS -DFFMPEG_VER_SHA=\"${FFMPEG_VER}\"
                                  -DUSE_STATIC_FFMPEG=1)
   set(FFMPEG_FOUND 1)

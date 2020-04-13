@@ -50,8 +50,8 @@ if(ENABLE_INTERNAL_DAV1D)
     message(STATUS "DAV1D_URL: ${DAV1D_URL}")
   endif()
 
-  set(DAV1D_LIBRARY ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/lib/libdav1d.a)
-  set(DAV1D_INCLUDE_DIR ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/include)
+  set(DAV1D_LIBRARY ${DEPENDS_BUILD_DIR}/lib/libdav1d.a)
+  set(DAV1D_INCLUDE_DIR ${DEPENDS_BUILD_DIR}/include)
   set(DAV1D_VERSION ${DAV1D_VER})
 
   externalproject_add(dav1d
@@ -63,7 +63,7 @@ if(ENABLE_INTERNAL_DAV1D)
                       CONFIGURE_COMMAND meson
                                         --buildtype=release
                                         --default-library=static
-                                        --prefix=${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
+                                        --prefix=${DEPENDS_BUILD_DIR}
                                         --libdir=lib
                                         -Denable_asm=true
                                         -Denable_tools=false
