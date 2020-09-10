@@ -122,12 +122,9 @@ bool Interface_GUIDialogNumeric::show_and_get_time(void* kodiBase, tm* time, con
     return false;
   }
 
-  KODI::TIME::SystemTime systemTime;
   CDateTime dateTime(*time);
-  dateTime.GetAsSystemTime(systemTime);
-  if (CGUIDialogNumeric::ShowAndGetTime(systemTime, heading))
+  if (CGUIDialogNumeric::ShowAndGetTime(dateTime, heading))
   {
-    dateTime = systemTime;
     dateTime.GetAsTm(*time);
     return true;
   }
@@ -152,12 +149,9 @@ bool Interface_GUIDialogNumeric::show_and_get_date(void* kodiBase, tm *date, con
     return false;
   }
 
-  KODI::TIME::SystemTime systemTime;
   CDateTime dateTime(*date);
-  dateTime.GetAsSystemTime(systemTime);
-  if (CGUIDialogNumeric::ShowAndGetDate(systemTime, heading))
+  if (CGUIDialogNumeric::ShowAndGetDate(dateTime, heading))
   {
-    dateTime = systemTime;
     dateTime.GetAsTm(*date);
     return true;
   }
