@@ -98,13 +98,22 @@ bool CDRMPlane::FindModifiers()
   drm_format_modifier* mod = reinterpret_cast<drm_format_modifier*>(
       reinterpret_cast<char*>(header) + header->modifiers_offset);
 
+  CLog::Log(LOGDEBUG, "CDRMPlane::{} - checking modifiers for plane id: {}", __FUNCTION__,
+            GetPlaneId());
+
   for (uint32_t i = 0; i < header->count_formats; i++)
   {
+    CLog::Log(LOGDEBUG, "CDRMPlane::{} -   format: {}", __FUNCTION__,
+              CDRMUtils::FourCCToString(formats[i]));
+    CLog::Log(LOGDEBUG, "CDRMPlane::{} -     modifiers:", __FUNCTION__);
     std::vector<uint64_t> modifiers;
     for (uint32_t j = 0; j < header->count_modifiers; j++)
     {
       if (mod[j].formats & 1ULL << i)
+      {
+        CLog::Log(LOGDEBUG, "CDRMPlane::{} -       {:#x}", __FUNCTION__, mod[j].modifier);
         modifiers.emplace_back(mod[j].modifier);
+      }
     }
 
     m_modifiers_map.emplace(formats[i], modifiers);
