@@ -223,6 +223,8 @@ bool CDRMUtils::FindPlanes()
     }
   }
 
+  CLog::Log(LOGINFO, "CDRMUtils::{} - using crtc: {}", __FUNCTION__, m_crtc->GetCrtcId());
+
   // video plane may not be available
   if (m_video_plane)
     CLog::Log(LOGDEBUG, "CDRMUtils::{} - using video plane {}", __FUNCTION__,
@@ -511,6 +513,9 @@ bool CDRMUtils::FindConnector()
   if (connector == m_connectors.end())
     return false;
 
+  CLog::Log(LOGINFO, "CDRMUtils::{} - using connector: {}", __FUNCTION__,
+            *connector->get()->GetConnectorId());
+
   m_connector = connector->get();
   return true;
 }
@@ -522,6 +527,9 @@ bool CDRMUtils::FindEncoder()
   });
   if (encoder == m_encoders.end())
     return false;
+
+  CLog::Log(LOGINFO, "CDRMUtils::{} - using encoder: {}", __FUNCTION__,
+            encoder->get()->GetEncoderId());
 
   m_encoder = encoder->get();
   return true;
