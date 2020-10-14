@@ -425,7 +425,10 @@ bool CDRMUtils::InitDrm()
 
   auto resources = drmModeGetResources(m_fd);
   if (!resources)
+  {
+    CLog::Log(LOGERROR, "CDRMUtils::{} - failed to get drm resources: {}", __FUNCTION__, strerror(errno));
     return false;
+  }
 
   for (int i = 0; i < resources->count_connectors; i++)
     m_connectors.emplace_back(std::make_unique<CDRMConnector>(m_fd, resources->connectors[i]));
@@ -440,7 +443,10 @@ bool CDRMUtils::InitDrm()
 
   auto planeResources = drmModeGetPlaneResources(m_fd);
   if (!planeResources)
+  {
+    CLog::Log(LOGERROR, "CDRMUtils::{} - failed to get drm plane resources: {}", __FUNCTION__, strerror(errno));
     return false;
+  }
 
   for (uint32_t i = 0; i < planeResources->count_planes; i++)
     m_planes.emplace_back(std::make_unique<CDRMPlane>(m_fd, planeResources->planes[i]));
@@ -510,8 +516,12 @@ bool CDRMUtils::FindConnector()
   auto connector = std::find_if(m_connectors.begin(), m_connectors.end(), [this](auto& connector) {
     return connector->GetEncoderId() > 0 && connector->IsConnected();
   });
+
   if (connector == m_connectors.end())
+  {
+    CLog::Log(LOGDEBUG, "CDRMUtils::{} - failed to find connected connector", __FUNCTION__);
     return false;
+  }
 
   CLog::Log(LOGINFO, "CDRMUtils::{} - using connector: {}", __FUNCTION__,
             *connector->get()->GetConnectorId());
@@ -525,8 +535,13 @@ bool CDRMUtils::FindEncoder()
   auto encoder = std::find_if(m_encoders.begin(), m_encoders.end(), [this](auto& encoder) {
     return encoder->GetEncoderId() == m_connector->GetEncoderId();
   });
+
   if (encoder == m_encoders.end())
+  {
+    CLog::Log(LOGDEBUG, "CDRMUtils::{} - failed to find encoder for connector id: {}", __FUNCTION__,
+              *m_connector->GetConnectorId());
     return false;
+  }
 
   CLog::Log(LOGINFO, "CDRMUtils::{} - using encoder: {}", __FUNCTION__,
             encoder->get()->GetEncoderId());
