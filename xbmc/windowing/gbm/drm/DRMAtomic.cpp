@@ -140,16 +140,15 @@ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool video
   auto ret = drmModeAtomicCommit(m_fd, m_req, flags | DRM_MODE_ATOMIC_TEST_ONLY, nullptr);
   if (ret < 0)
   {
+    UpdateRequestQueue(false);
     CLog::Log(LOGERROR, "CDRMAtomic::{} - test commit failed: {}", __FUNCTION__, strerror(errno));
   }
-  else if (ret == 0)
+
+  ret = drmModeAtomicCommit(m_fd, m_req, flags, nullptr);
+  if (ret < 0)
   {
-    ret = drmModeAtomicCommit(m_fd, m_req, flags, nullptr);
-    if (ret < 0)
-    {
-      CLog::Log(LOGERROR, "CDRMAtomic::{} - atomic commit failed: {}", __FUNCTION__,
-                strerror(errno));
-    }
+    CLog::Log(LOGERROR, "CDRMAtomic::{} - atomic commit failed: {}", __FUNCTION__,
+              strerror(errno));
   }
 
   if (flags & DRM_MODE_ATOMIC_ALLOW_MODESET)
@@ -159,8 +158,7 @@ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool video
                 strerror(errno));
   }
 
-  drmModeAtomicFree(m_req);
-  m_req = drmModeAtomicAlloc();
+  UpdateRequestQueue(true);
 }
 
 void CDRMAtomic::FlipPage(struct gbm_bo *bo, bool rendered, bool videoLayer)
@@ -207,7 +205,7 @@ bool CDRMAtomic::InitDrm()
     return false;
   }
 
-  m_req = drmModeAtomicAlloc();
+  UpdateRequestQueue(true);
 
   if (!CDRMUtils::InitDrm())
     return false;
@@ -234,9 +232,6 @@ bool CDRMAtomic::InitDrm()
 void CDRMAtomic::DestroyDrm()
 {
   CDRMUtils::DestroyDrm();
-
-  drmModeAtomicFree(m_req);
-  m_req = nullptr;
 }
 
 bool CDRMAtomic::SetVideoMode(const RESOLUTION_INFO& res, struct gbm_bo *bo)
@@ -275,4 +270,16 @@ bool CDRMAtomic::DisplayHardwareScalingEnabled()
     return true;
 
   return false;
+}
+
+void CDRMAtomic::UpdateRequestQueue(bool success)
+{
+  if (m_atomicRequestQueue.size() > 1)
+    m_atomicRequestQueue.pop_back();
+
+  if (success)
+    m_atomicRequestQueue.emplace_back(
+        std::unique_ptr<drmModeAtomicReq, DrmModeAtomicReqDeleter>(drmModeAtomicAlloc()));
+
+  m_req = m_atomicRequestQueue.back().get();
 }

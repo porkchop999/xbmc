@@ -10,6 +10,9 @@
 
 #include "DRMUtils.h"
 
+#include <deque>
+#include <memory>
+
 namespace KODI
 {
 namespace WINDOWING
@@ -32,6 +35,8 @@ public:
   bool DisplayHardwareScalingEnabled();
 
 private:
+  void UpdateRequestQueue(bool success);
+
   void DrmAtomicCommit(int fb_id, int flags, bool rendered, bool videoLayer);
 
   bool SetScalingFilter(struct CDRMObject* object, const char* name, const char* type);
@@ -39,6 +44,13 @@ private:
   bool m_need_modeset;
   bool m_active = true;
   drmModeAtomicReq *m_req = nullptr;
+
+  struct DrmModeAtomicReqDeleter
+  {
+    void operator()(drmModeAtomicReqPtr p) const { drmModeAtomicFree(p); }
+  };
+
+  std::deque<std::unique_ptr<drmModeAtomicReq, DrmModeAtomicReqDeleter>> m_atomicRequestQueue;
 };
 
 }
