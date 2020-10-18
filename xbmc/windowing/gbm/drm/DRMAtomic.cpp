@@ -137,6 +137,14 @@ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool video
     AddProperty(m_gui_plane, "CRTC_ID", 0);
   }
 
+  const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  auto enabled = settings->GetBool("videoscreen.atomictest");
+  if (enabled)
+  {
+    AddProperty(m_gui_plane, "CRTC_W", -1);
+    AddProperty(m_gui_plane, "CRTC_H", -1);
+  }
+
   auto ret = drmModeAtomicCommit(m_fd, m_req->Get(), flags | DRM_MODE_ATOMIC_TEST_ONLY, nullptr);
   if (ret < 0)
   {
