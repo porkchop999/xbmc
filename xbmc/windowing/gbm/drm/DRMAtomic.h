@@ -11,6 +11,7 @@
 #include "DRMUtils.h"
 
 #include <deque>
+#include <map>
 #include <memory>
 
 namespace KODI
@@ -43,14 +44,34 @@ private:
 
   bool m_need_modeset;
   bool m_active = true;
-  drmModeAtomicReq *m_req = nullptr;
 
-  struct DrmModeAtomicReqDeleter
+  class CDRMAtomicRequest
   {
-    void operator()(drmModeAtomicReqPtr p) const { drmModeAtomicFree(p); }
+  public:
+    CDRMAtomicRequest();
+    ~CDRMAtomicRequest() = default;
+    CDRMAtomicRequest(const CDRMAtomicRequest& right) = delete;
+
+    drmModeAtomicReqPtr Get() const { return m_atomicRequest.get(); }
+
+    bool AddProperty(CDRMObject* object, const char* name, uint64_t value);
+
+    void PrintAtomicDiff(CDRMAtomicRequest* right);
+    void PrintAtomicRequest();
+
+  private:
+    std::map<CDRMObject*, std::map<uint32_t, uint64_t>> m_atomicRequestItems;
+
+    struct DrmModeAtomicReqDeleter
+    {
+      void operator()(drmModeAtomicReqPtr p) const;
+    };
+
+    std::unique_ptr<drmModeAtomicReq, DrmModeAtomicReqDeleter> m_atomicRequest;
   };
 
-  std::deque<std::unique_ptr<drmModeAtomicReq, DrmModeAtomicReqDeleter>> m_atomicRequestQueue;
+  CDRMAtomicRequest* m_req = nullptr;
+  std::deque<std::unique_ptr<CDRMAtomicRequest>> m_atomicRequestQueue;
 };
 
 }

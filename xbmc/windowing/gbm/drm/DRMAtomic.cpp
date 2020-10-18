@@ -137,14 +137,14 @@ void CDRMAtomic::DrmAtomicCommit(int fb_id, int flags, bool rendered, bool video
     AddProperty(m_gui_plane, "CRTC_ID", 0);
   }
 
-  auto ret = drmModeAtomicCommit(m_fd, m_req, flags | DRM_MODE_ATOMIC_TEST_ONLY, nullptr);
+  auto ret = drmModeAtomicCommit(m_fd, m_req->Get(), flags | DRM_MODE_ATOMIC_TEST_ONLY, nullptr);
   if (ret < 0)
   {
     UpdateRequestQueue(false);
     CLog::Log(LOGERROR, "CDRMAtomic::{} - test commit failed: {}", __FUNCTION__, strerror(errno));
   }
 
-  ret = drmModeAtomicCommit(m_fd, m_req, flags, nullptr);
+  ret = drmModeAtomicCommit(m_fd, m_req->Get(), flags, nullptr);
   if (ret < 0)
   {
     CLog::Log(LOGERROR, "CDRMAtomic::{} - atomic commit failed: {}", __FUNCTION__,
@@ -251,15 +251,7 @@ bool CDRMAtomic::SetActive(bool active)
 
 bool CDRMAtomic::AddProperty(CDRMObject* object, const char* name, uint64_t value)
 {
-  uint32_t propId = object->GetPropertyId(name);
-  if (propId == 0)
-    return false;
-
-  int ret = drmModeAtomicAddProperty(m_req, object->GetId(), propId, value);
-  if (ret < 0)
-    return false;
-
-  return true;
+  return m_req->AddProperty(object, name, value);
 }
 
 bool CDRMAtomic::DisplayHardwareScalingEnabled()
@@ -274,12 +266,92 @@ bool CDRMAtomic::DisplayHardwareScalingEnabled()
 
 void CDRMAtomic::UpdateRequestQueue(bool success)
 {
+  if (m_atomicRequestQueue.size() > 1 && !success)
+    m_req->PrintAtomicDiff(m_atomicRequestQueue.front().get());
+
   if (m_atomicRequestQueue.size() > 1)
     m_atomicRequestQueue.pop_back();
 
   if (success)
-    m_atomicRequestQueue.emplace_back(
-        std::unique_ptr<drmModeAtomicReq, DrmModeAtomicReqDeleter>(drmModeAtomicAlloc()));
+    m_atomicRequestQueue.emplace_back(std::make_unique<CDRMAtomicRequest>());
 
   m_req = m_atomicRequestQueue.back().get();
 }
+
+CDRMAtomic::CDRMAtomicRequest::CDRMAtomicRequest() : m_atomicRequest(drmModeAtomicAlloc())
+{
+}
+
+bool CDRMAtomic::CDRMAtomicRequest::AddProperty(CDRMObject* object, const char* name, uint64_t value)
+{
+  uint32_t propertyId = object->GetPropertyId(name);
+  if (propertyId == 0)
+    return false;
+
+  int ret = drmModeAtomicAddProperty(m_atomicRequest.get(), object->GetId(), propertyId, value);
+  if (ret < 0)
+    return false;
+
+  m_atomicRequestItems[object][propertyId] = value;
+  return true;
+}
+
+void CDRMAtomic::CDRMAtomicRequest::PrintAtomicDiff(CDRMAtomicRequest* right)
+{
+  std::map<CDRMObject*, std::map<uint32_t, uint64_t>> atomicDiff;
+
+  for (const auto& object : m_atomicRequestItems)
+  {
+    auto sameObject = right->m_atomicRequestItems.find(object.first);
+    if (sameObject != right->m_atomicRequestItems.end())
+    {
+      CLog::Log(LOGDEBUG, "Atomic Request contains the same object: {}", object.first->GetId());
+
+      std::map<uint32_t, uint64_t> propertyDiff;
+
+      std::set_difference(m_atomicRequestItems[object.first].begin(), m_atomicRequestItems[object.first].end(),
+                      right->m_atomicRequestItems[object.first].begin(), right->m_atomicRequestItems[object.first].end(),
+                      std::inserter(propertyDiff, propertyDiff.begin()));
+
+      atomicDiff.emplace(std::make_pair(object.first, propertyDiff));
+    }
+    else
+    {
+      atomicDiff.emplace(std::make_pair(object.first, m_atomicRequestItems[object.first]));
+    }
+  }
+
+  std::string atomicRequestItems{"Atomic Request Diff:"};
+  for (const auto& object : atomicDiff)
+  {
+    atomicRequestItems.append("\nObject: " + object.first->GetTypeName() +
+                              "\tID: " + std::to_string(object.first->GetId()));
+    for (const auto& property : object.second)
+      atomicRequestItems.append("\n  Property: " + object.first->GetPropertyName(property.first) +
+                                "\tID: " + std::to_string(property.first) +
+                                "\tValue: " + std::to_string(property.second));
+  }
+
+  CLog::Log(LOGDEBUG, "{}", atomicRequestItems);
+}
+
+void CDRMAtomic::CDRMAtomicRequest::PrintAtomicRequest()
+{
+  std::string atomicRequestItems{"Atomic Request:"};
+  for (const auto& object : m_atomicRequestItems)
+  {
+    atomicRequestItems.append("\nObject: " + object.first->GetTypeName() +
+                              "\tID: " + std::to_string(object.first->GetId()));
+    for (const auto& property : object.second)
+      atomicRequestItems.append("\n  Property: " + object.first->GetPropertyName(property.first) +
+                                "\tID: " + std::to_string(property.first) +
+                                "\tValue: " + std::to_string(property.second));
+  }
+
+  CLog::Log(LOGDEBUG, "{}", atomicRequestItems);
+}
+
+void CDRMAtomic::CDRMAtomicRequest::DrmModeAtomicReqDeleter::operator()(drmModeAtomicReqPtr p) const
+{
+  drmModeAtomicFree(p);
+};
