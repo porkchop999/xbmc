@@ -453,6 +453,12 @@ bool CPeripheralAddon::ProcessEvents(void)
               joystickDevice->OnAxisMotion(event.DriverIndex(), event.AxisState());
               break;
             }
+            case PERIPHERAL_EVENT_TYPE_BATTERY:
+            {
+              CLog::Log(LOGDEBUG, "PERIPHERAL BATTERY - Capacity: {} Status: {}",
+                        event.BatteryCapacityState(), event.BatteryStatusState());
+              break;
+            }
             default:
               break;
           }
