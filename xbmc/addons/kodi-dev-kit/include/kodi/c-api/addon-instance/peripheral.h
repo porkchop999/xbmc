@@ -133,6 +133,9 @@ extern "C"
 
     /// @brief set the state for joystick rumble motor
     PERIPHERAL_EVENT_TYPE_SET_MOTOR,
+
+    /// @brief state changed for joystick battery
+    PERIPHERAL_EVENT_TYPE_BATTERY,
   } PERIPHERAL_EVENT_TYPE;
   ///@}
   //----------------------------------------------------------------------------
@@ -209,6 +212,18 @@ extern "C"
   typedef float JOYSTICK_STATE_MOTOR;
   //----------------------------------------------------------------------------
 
+  //============================================================================
+  /// @ingroup cpp_kodi_addon_peripheral_Defs_Event
+  /// @brief Battery percentage value in the closed interval [0, 100]
+  typedef uint8_t JOYSTICK_STATE_BATTERY_CAPACITY;
+  //----------------------------------------------------------------------------
+
+  //============================================================================
+  /// @ingroup cpp_kodi_addon_peripheral_Defs_Event
+  /// @brief Battery status (charging, discharging, full, empty, etc)
+  typedef const char* JOYSTICK_STATE_BATTERY_STATUS;
+  //----------------------------------------------------------------------------
+
   /*!
    * @brief Event information
    */
@@ -227,6 +242,8 @@ extern "C"
     JOYSTICK_STATE_HAT driver_hat_state;
     JOYSTICK_STATE_AXIS driver_axis_state;
     JOYSTICK_STATE_MOTOR motor_state;
+    JOYSTICK_STATE_BATTERY_CAPACITY battery_capacity_state;
+    JOYSTICK_STATE_BATTERY_STATUS battery_status_state;
   } ATTRIBUTE_PACKED PERIPHERAL_EVENT;
 
   //}

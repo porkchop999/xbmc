@@ -432,6 +432,21 @@ public:
   {
   }
 
+  /// @brief Constructor.
+  ///
+  /// @param[in] peripheralIndex %Peripheral index
+  /// @param[in] capacity Battery capacity
+  /// @param[in] status Battery status
+  PeripheralEvent(unsigned int peripheralIndex,
+                  JOYSTICK_STATE_BATTERY_CAPACITY capacity,
+                  JOYSTICK_STATE_BATTERY_STATUS status)
+    : m_type(PERIPHERAL_EVENT_TYPE_BATTERY),
+      m_peripheralIndex(peripheralIndex),
+      m_batteryCapacityState(capacity),
+      m_batterStatusState(status)
+  {
+  }
+
   /// @brief Get type of event.
   ///
   /// @return Type defined with @ref PERIPHERAL_EVENT_TYPE
@@ -466,6 +481,19 @@ public:
   ///
   /// @return Motor state
   JOYSTICK_STATE_MOTOR MotorState(void) const { return m_motorState; }
+
+  /// @brief Get battery capacity.
+  ///
+  /// @return Battery Capacity
+  JOYSTICK_STATE_BATTERY_CAPACITY BatteryCapacityState(void) const
+  {
+    return m_batteryCapacityState;
+  }
+
+  /// @brief Get battery status.
+  ///
+  /// @return Battery Status
+  JOYSTICK_STATE_BATTERY_STATUS BatteryStatusState(void) const { return m_batterStatusState; }
 
   /// @brief Set type of event.
   ///
@@ -511,7 +539,9 @@ public:
       m_buttonState(event.driver_button_state),
       m_hatState(event.driver_hat_state),
       m_axisState(event.driver_axis_state),
-      m_motorState(event.motor_state)
+      m_motorState(event.motor_state),
+      m_batteryCapacityState(event.battery_capacity_state),
+      m_batterStatusState(event.battery_status_state)
   {
   }
 
@@ -524,6 +554,8 @@ public:
     event.driver_hat_state = m_hatState;
     event.driver_axis_state = m_axisState;
     event.motor_state = m_motorState;
+    event.battery_capacity_state = m_batteryCapacityState;
+    event.battery_status_state = m_batterStatusState;
   }
 
   static void FreeStruct(PERIPHERAL_EVENT& event) { (void)event; }
@@ -536,6 +568,8 @@ private:
   JOYSTICK_STATE_HAT m_hatState = JOYSTICK_STATE_HAT_UNPRESSED;
   JOYSTICK_STATE_AXIS m_axisState = 0.0f;
   JOYSTICK_STATE_MOTOR m_motorState = 0.0f;
+  JOYSTICK_STATE_BATTERY_CAPACITY m_batteryCapacityState = 0;
+  JOYSTICK_STATE_BATTERY_STATUS m_batterStatusState = "disconnected";
 };
 ///@}
 //------------------------------------------------------------------------------
