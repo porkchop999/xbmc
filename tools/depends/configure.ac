@@ -295,9 +295,11 @@ case $host in
     cross_compiling="yes"
   ;;
   arm*-*-linux-gnu*|arm*-*-linux-uclibc*|aarch64*-*-linux-gnu*|aarch*-*-linux-be*)
+    platform_cflags="-fPIC -DPIC"
     case $host in
       arm*-*-linux-gnu*|arm*-*-linux-uclibc*)
         meson_cpu="arm"
+        platform_cflags+=" -mfpu=neon"
       ;;
       aarch64*-*-linux-gnu*|aarch*-*-linux-be*)
         meson_cpu="aarch64"
@@ -307,7 +309,6 @@ case $host in
       use_cpu=$host_cpu
     fi
     use_toolchain="${use_toolchain:-/usr}"
-    platform_cflags="-fPIC -DPIC"
     optimize_flags="-Os"
     platform_ldflags="-Wl,-rpath-link=$prefix/$deps_dir/lib"
     platform_cxxflags="$platform_cflags"
