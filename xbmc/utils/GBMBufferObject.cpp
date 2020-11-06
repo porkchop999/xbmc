@@ -12,6 +12,8 @@
 #include "ServiceBroker.h"
 #include "windowing/gbm/WinSystemGbmEGLContext.h"
 
+#include <cstring>
+
 #include <gbm.h>
 
 using namespace KODI::WINDOWING::GBM;
@@ -71,7 +73,8 @@ uint8_t* CGBMBufferObject::GetMemory()
 {
   if (m_bo)
   {
-    m_map = static_cast<uint8_t*>(gbm_bo_map(m_bo, 0, 0, m_width, m_height, GBM_BO_TRANSFER_WRITE, &m_stride, &m_map_data));
+    m_map = static_cast<uint8_t*>(gbm_bo_map(m_bo, 0, 0, m_width, m_height,
+                                             GBM_BO_TRANSFER_READ_WRITE, &m_stride, &m_map_data));
     if (m_map)
       return m_map;
   }
@@ -96,4 +99,34 @@ uint64_t CGBMBufferObject::GetModifier()
 #else
   return 0;
 #endif
+}
+
+bool CGBMBufferObject::ImportBufferObject(uint32_t width,
+                                          uint32_t height,
+                                          uint32_t format,
+                                          uint32_t planeCount,
+                                          int* fds,
+                                          int* strides,
+                                          int* offsets,
+                                          uint64_t modifier)
+{
+  m_width = width;
+  m_height = height;
+
+  gbm_import_fd_modifier_data data;
+  data.width = m_width;
+  data.height = m_height;
+  data.format = format;
+  data.num_fds = planeCount;
+  data.modifier = modifier;
+
+  std::memcpy(data.fds, fds, sizeof(data.fds));
+  std::memcpy(data.strides, strides, sizeof(data.strides));
+  std::memcpy(data.offsets, offsets, sizeof(data.offsets));
+
+  m_bo = gbm_bo_import(m_device, GBM_BO_IMPORT_FD_MODIFIER, &data, GBM_BO_USE_RENDERING);
+  if (!m_bo)
+    return false;
+
+  return true;
 }

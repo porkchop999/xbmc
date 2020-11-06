@@ -36,6 +36,15 @@ public:
   // CBufferObject overrides
   uint64_t GetModifier() override;
 
+  bool ImportBufferObject(uint32_t width,
+                          uint32_t height,
+                          uint32_t format,
+                          uint32_t planeCount,
+                          int* fds,
+                          int* strides,
+                          int* offsets,
+                          uint64_t modifier);
+
 private:
   gbm_device* m_device{nullptr};
   gbm_bo* m_bo{nullptr};
