@@ -291,7 +291,11 @@ namespace XBMCAddon
         return ret;
       }
 
-      CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+      auto gui = CServiceBroker::GetGUI();
+      if (!gui)
+        return "";
+
+      CGUIInfoManager& infoMgr = gui->GetInfoManager();
       int ret = infoMgr.TranslateString(cLine);
       //doesn't seem to be a single InfoTag?
       //try full blown GuiInfoLabel then
@@ -310,9 +314,13 @@ namespace XBMCAddon
           return ret;
         }
 
-      CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
-      int ret = infoMgr.TranslateString(infotag);
-      return infoMgr.GetImage(ret, WINDOW_INVALID);
+        auto gui = CServiceBroker::GetGUI();
+        if (!gui)
+          return "";
+
+        CGUIInfoManager& infoMgr = gui->GetInfoManager();
+        int ret = infoMgr.TranslateString(infotag);
+        return infoMgr.GetImage(ret, WINDOW_INVALID);
     }
 
     void playSFX(const char* filename, bool useCached)
@@ -321,7 +329,7 @@ namespace XBMCAddon
       if (!filename)
         return;
 
-      CGUIComponent* gui = CServiceBroker::GetGUI();
+      auto gui = CServiceBroker::GetGUI();
       if (XFILE::CFile::Exists(filename) && gui)
       {
         gui->GetAudioManager().PlayPythonSound(filename,useCached);
@@ -332,7 +340,7 @@ namespace XBMCAddon
     {
       XBMC_TRACE;
       DelayedCallGuard dg;
-      CGUIComponent* gui = CServiceBroker::GetGUI();
+      auto gui = CServiceBroker::GetGUI();
       if (gui)
         gui->GetAudioManager().Stop();
     }
@@ -340,7 +348,7 @@ namespace XBMCAddon
     void enableNavSounds(bool yesNo)
     {
       XBMC_TRACE;
-      CGUIComponent* gui = CServiceBroker::GetGUI();
+      auto gui = CServiceBroker::GetGUI();
       if (gui)
         gui->GetAudioManager().Enable(yesNo);
     }
@@ -355,10 +363,14 @@ namespace XBMCAddon
       {
         XBMCAddonUtils::GuiLock lock(nullptr, false);
 
-        int id = CServiceBroker::GetGUI()->GetWindowManager().GetTopmostModalDialog();
+        auto gui = CServiceBroker::GetGUI();
+        if (!gui)
+          return false;
+
+        int id = gui->GetWindowManager().GetTopmostModalDialog();
         if (id == WINDOW_INVALID)
-          id = CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow();
-        ret = CServiceBroker::GetGUI()->GetInfoManager().EvaluateBool(condition,id);
+          id = gui->GetWindowManager().GetActiveWindow();
+        ret = gui->GetInfoManager().EvaluateBool(condition, id);
       }
 
       return ret;
@@ -471,7 +483,12 @@ namespace XBMCAddon
     bool skinHasImage(const char* image)
     {
       XBMC_TRACE;
-      return CServiceBroker::GetGUI()->GetTextureManager().HasTexture(image);
+
+      auto gui = CServiceBroker::GetGUI();
+      if (!gui)
+        return false;
+
+      return gui->GetTextureManager().HasTexture(image);
     }
 
 

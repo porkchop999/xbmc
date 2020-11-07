@@ -224,6 +224,11 @@ void CEventLog::ShowFullEventLog(EventLevel level /* = EventLevel::Basic */, boo
 
 void CEventLog::SendMessage(const EventPtr& eventPtr, int message)
 {
-  CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, message, 0, XFILE::CEventsDirectory::EventToFileItem(eventPtr));
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+  auto gui = CServiceBroker::GetGUI();
+  if (gui)
+  {
+    CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, message, 0,
+                    XFILE::CEventsDirectory::EventToFileItem(eventPtr));
+    gui->GetWindowManager().SendThreadMessage(msg);
+  }
 }

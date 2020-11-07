@@ -316,6 +316,8 @@ CUPnPRenderer::UpdateState()
 
     avt->SetStateVariable("TransportStatus", "OK");
 
+    auto gui = CServiceBroker::GetGUI();
+
     if (g_application.GetAppPlayer().IsPlaying() || g_application.GetAppPlayer().IsPausedPlayback()) {
         avt->SetStateVariable("NumberOfTracks", "1");
         avt->SetStateVariable("CurrentTrack", "1");
@@ -334,40 +336,42 @@ CUPnPRenderer::UpdateState()
           avt->SetStateVariable("CurrentTrackDuration", "00:00:00");
           avt->SetStateVariable("CurrentMediaDuration", "00:00:00");
         }
+    }
+    else if (gui && gui->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW)
+    {
+      avt->SetStateVariable("TransportState", "PLAYING");
 
-    } else if (CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW) {
-        avt->SetStateVariable("TransportState", "PLAYING");
+      const std::string filePath = gui->GetInfoManager().GetLabel(SLIDESHOW_FILE_PATH);
+      avt->SetStateVariable("AVTransportURI", filePath.c_str());
+      avt->SetStateVariable("CurrentTrackURI", filePath.c_str());
+      avt->SetStateVariable("TransportPlaySpeed", "1");
 
-        const std::string filePath = CServiceBroker::GetGUI()->GetInfoManager().GetLabel(SLIDESHOW_FILE_PATH);
-        avt->SetStateVariable("AVTransportURI" , filePath.c_str());
-        avt->SetStateVariable("CurrentTrackURI", filePath.c_str());
-        avt->SetStateVariable("TransportPlaySpeed", "1");
+      CGUIWindowSlideShow* slideshow =
+          gui->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
+      if (slideshow)
+      {
+        std::string index;
+        index = StringUtils::Format("%d", slideshow->NumSlides());
+        avt->SetStateVariable("NumberOfTracks", index.c_str());
+        index = StringUtils::Format("%d", slideshow->CurrentSlide());
+        avt->SetStateVariable("CurrentTrack", index.c_str());
+      }
 
-        CGUIWindowSlideShow *slideshow = CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIWindowSlideShow>(WINDOW_SLIDESHOW);
-        if (slideshow)
-        {
-          std::string index;
-          index = StringUtils::Format("%d", slideshow->NumSlides());
-          avt->SetStateVariable("NumberOfTracks", index.c_str());
-          index = StringUtils::Format("%d", slideshow->CurrentSlide());
-          avt->SetStateVariable("CurrentTrack", index.c_str());
-
-        }
-
-        avt->SetStateVariable("CurrentTrackMetadata", "");
-        avt->SetStateVariable("AVTransportURIMetaData", "");
-
-    } else {
-        avt->SetStateVariable("TransportState", "STOPPED");
-        avt->SetStateVariable("TransportPlaySpeed", "1");
-        avt->SetStateVariable("NumberOfTracks", "0");
-        avt->SetStateVariable("CurrentTrack", "0");
-        avt->SetStateVariable("RelativeTimePosition", "00:00:00");
-        avt->SetStateVariable("AbsoluteTimePosition", "00:00:00");
-        avt->SetStateVariable("CurrentTrackDuration", "00:00:00");
-        avt->SetStateVariable("CurrentMediaDuration", "00:00:00");
-        avt->SetStateVariable("NextAVTransportURI", "");
-        avt->SetStateVariable("NextAVTransportURIMetaData", "");
+      avt->SetStateVariable("CurrentTrackMetadata", "");
+      avt->SetStateVariable("AVTransportURIMetaData", "");
+    }
+    else
+    {
+      avt->SetStateVariable("TransportState", "STOPPED");
+      avt->SetStateVariable("TransportPlaySpeed", "1");
+      avt->SetStateVariable("NumberOfTracks", "0");
+      avt->SetStateVariable("CurrentTrack", "0");
+      avt->SetStateVariable("RelativeTimePosition", "00:00:00");
+      avt->SetStateVariable("AbsoluteTimePosition", "00:00:00");
+      avt->SetStateVariable("CurrentTrackDuration", "00:00:00");
+      avt->SetStateVariable("CurrentMediaDuration", "00:00:00");
+      avt->SetStateVariable("NextAVTransportURI", "");
+      avt->SetStateVariable("NextAVTransportURIMetaData", "");
     }
 }
 

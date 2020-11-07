@@ -684,7 +684,12 @@ void CPythonInvoker::onError(const std::string& exceptionType /* = "" */,
                              const std::string& exceptionTraceback /* = "" */)
 {
   CPyThreadState releaseGil;
-  CSingleLock gc(CServiceBroker::GetWinSystem()->GetGfxContext());
+
+  auto winSystem = CServiceBroker::GetWinSystem();
+  if (!winSystem)
+    return;
+
+  CSingleLock gc(winSystem->GetGfxContext());
 
   CGUIDialogKaiToast* pDlgToast =
       CServiceBroker::GetGUI()->GetWindowManager().GetWindow<CGUIDialogKaiToast>(

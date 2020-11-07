@@ -420,9 +420,13 @@ void CPeripherals::OnDeviceDeleted(const CPeripheralBus& bus, const CPeripheral&
 void CPeripherals::OnDeviceChanged()
 {
   // refresh settings (peripherals manager could be enabled/disabled now)
-  CGUIMessage msgSettings(GUI_MSG_UPDATE, WINDOW_SETTINGS_SYSTEM, 0);
-  CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msgSettings,
-                                                                 WINDOW_SETTINGS_SYSTEM);
+  auto gui = CServiceBroker::GetGUI();
+  if (gui)
+  {
+    CGUIMessage msgSettings(GUI_MSG_UPDATE, WINDOW_SETTINGS_SYSTEM, 0);
+    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msgSettings,
+                                                                   WINDOW_SETTINGS_SYSTEM);
+  }
 
   SetChanged();
 }
