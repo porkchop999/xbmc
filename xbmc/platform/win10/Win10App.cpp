@@ -89,7 +89,7 @@ void App::Run()
       appParamParser.m_standAlone = true;
 
     // Create and run the app
-    XBMC_Run(true, appParamParser);
+    XBMC_Run(appParamParser);
   }
 
   WSACleanup();

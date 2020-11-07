@@ -111,7 +111,7 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR commandLine, INT)
     CAppParamParser appParamParser;
     appParamParser.Parse(argv, argc);
     // Create and run the app
-    status = XBMC_Run(true, appParamParser);
+    status = XBMC_Run(appParamParser);
   }
 
   for (int i = 0; i < argc; ++i)

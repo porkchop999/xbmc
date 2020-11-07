@@ -73,6 +73,7 @@ void CAppParamParser::DisplayHelp()
   printf("  --test\t\tEnable test mode. [FILE] required.\n");
   printf("  --settings=<filename>\t\tLoads specified file after advancedsettings.xml replacing any settings specified\n");
   printf("  \t\t\t\tspecified file must exist in special://xbmc/system/\n");
+  printf("  --headless\t\tEnable headless mode\n");
 #if defined(TARGET_LINUX)
   printf("  --windowing=<system>\tSelect which windowing method to use.\n");
   printf("  \t\t\t\tAvailable window systems are:");
@@ -101,6 +102,8 @@ void CAppParamParser::ParseArg(const std::string &arg)
     m_testmode = true;
   else if (arg.substr(0, 11) == "--settings=")
     m_settingsFile = arg.substr(11);
+  else if (arg == "--headless")
+    m_headless = true;
 #if defined(TARGET_LINUX)
   else if (arg.substr(0, 12) == "--windowing=")
   {

@@ -18,11 +18,12 @@
 #include "platform/android/activity/XBMCApp.h"
 #endif
 
+#include "AppParamParser.h"
+#include "commons/Exception.h"
 #include "platform/MessagePrinter.h"
 #include "utils/log.h"
-#include "commons/Exception.h"
 
-extern "C" int XBMC_Run(bool renderGUI, const CAppParamParser &params)
+extern "C" int XBMC_Run(const CAppParamParser& params)
 {
   int status = -1;
 
@@ -36,7 +37,7 @@ extern "C" int XBMC_Run(bool renderGUI, const CAppParamParser &params)
   CXBMCApp::get()->Initialize();
 #endif
 
-  if (renderGUI && !g_application.CreateGUI())
+  if (!params.m_headless && !g_application.CreateGUI())
   {
     CMessagePrinter::DisplayError("ERROR: Unable to create GUI. Exiting");
     g_application.Stop(EXITCODE_QUIT);

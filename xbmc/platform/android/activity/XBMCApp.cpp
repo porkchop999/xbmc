@@ -506,7 +506,7 @@ void CXBMCApp::run()
   android_printf(" => running XBMC_Run...");
 
   CAppParamParser appParamParser;
-  status = XBMC_Run(true, appParamParser);
+  status = XBMC_Run(appParamParser);
   android_printf(" => XBMC_Run finished with %d", status);
 
   // If we are have not been force by Android to exit, notify its finish routine.

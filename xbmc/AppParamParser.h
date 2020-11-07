@@ -30,6 +30,7 @@ public:
   bool m_platformDirectories = true;
   bool m_testmode = false;
   bool m_standAlone = false;
+  bool m_headless = false;
   std::string m_windowing;
 
 private:
