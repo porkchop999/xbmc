@@ -48,7 +48,7 @@ bool CGBMBufferObject::CreateBufferObject(uint32_t format, uint32_t width, uint3
   m_width = width;
   m_height = height;
 
-  m_bo = gbm_bo_create(m_device, m_width, m_height, format, GBM_BO_USE_LINEAR);
+  m_bo = gbm_bo_create(m_device, m_width, m_height, format, GBM_BO_USE_RENDERING);
 
   if (!m_bo)
     return false;
