@@ -36,7 +36,7 @@
 #endif
 #include "utils/Stopwatch.h"
 #include "windowing/OSScreenSaver.h"
-#include "windowing/XBMC_events.h"
+// #include "windowing/XBMC_events.h"
 #include "threads/SystemClock.h"
 #include "threads/Thread.h"
 
@@ -117,7 +117,7 @@ class CApplication : public CXBApplicationEx, public IPlayerCallback, public IMs
                      public ISettingCallback, public ISettingsHandler, public ISubSettings,
                      public KODI::MESSAGING::IMessageTarget
 {
-friend class CAppInboundProtocol;
+  // friend class CAppInboundProtocol;
 
 public:
 
@@ -139,8 +139,8 @@ public:
   CApplication(void);
   ~CApplication(void) override;
   bool Initialize() override;
-  void FrameMove(bool processEvents, bool processGUI = true) override;
-  void Render() override;
+  // void FrameMove(bool processEvents, bool processGUI = true) override;
+  // void Render() override;
   virtual void Preflight();
   bool Create(const CAppParamParser &params);
   bool Cleanup() override;
@@ -148,8 +148,8 @@ public:
   bool IsInitialized() const { return !m_bInitializing; }
   bool IsStopping() const { return m_bStop; }
 
-  bool CreateGUI();
-  bool InitWindow(RESOLUTION res = RES_INVALID);
+  // bool CreateGUI();
+  // bool InitWindow(RESOLUTION res = RES_INVALID);
   void StartServices();
   void StopServices();
 
@@ -157,9 +157,9 @@ public:
 
   bool IsCurrentThread() const;
   void Stop(int exitCode);
-  void UnloadSkin();
-  bool LoadCustomWindows();
-  void ReloadSkin(bool confirm = false);
+  // void UnloadSkin();
+  // bool LoadCustomWindows();
+  // void ReloadSkin(bool confirm = false);
   const std::string& CurrentFile();
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
@@ -208,7 +208,7 @@ public:
   void CloseNetworkShares();
 
   void ShowAppMigrationMessage();
-  void Process() override;
+  void Process();
   void ProcessSlow();
   void ResetScreenSaver();
   float GetVolumePercent() const;
@@ -322,8 +322,6 @@ public:
 
   bool SwitchToFullScreen(bool force = false);
 
-  bool GetRenderGUI() const override { return m_renderGUI; };
-
   bool SetLanguage(const std::string &strLanguage);
   bool LoadLanguage(bool reload);
 
@@ -366,13 +364,10 @@ protected:
                        const char* oldSettingId,
                        const TiXmlNode* oldSettingNode) override;
 
-  bool LoadSkin(const std::string& skinID);
+  // bool LoadSkin(const std::string& skinID);
 
   void CheckOSScreenSaverInhibitionSetting();
   void PlaybackCleanup();
-
-  // inbound protocol
-  bool OnEvent(XBMC_Event& newEvent);
 
   /*!
    \brief Delegates the action to all registered action handlers.
@@ -383,12 +378,12 @@ protected:
 
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   std::unique_ptr<CSettingsComponent> m_pSettingsComponent;
-  std::unique_ptr<CGUIComponent> m_pGUI;
-  std::unique_ptr<CWinSystemBase> m_pWinSystem;
+  // std::unique_ptr<CGUIComponent> m_pGUI;
+  // std::unique_ptr<CWinSystemBase> m_pWinSystem;
   std::unique_ptr<ActiveAE::CActiveAE> m_pActiveAE;
-  std::shared_ptr<CAppInboundProtocol> m_pAppPort;
-  std::deque<XBMC_Event> m_portEvents;
-  CCriticalSection m_portSection;
+  // std::shared_ptr<CAppInboundProtocol> m_pAppPort;
+  // std::deque<XBMC_Event> m_portEvents;
+  // CCriticalSection m_portSection;
 
   bool m_confirmSkinChange = true;
   bool m_ignoreSkinSettingChanges = false;
@@ -465,7 +460,6 @@ protected:
   bool PlayStack(CFileItem& item, bool bRestart);
 
   float NavigationIdleTime();
-  void HandlePortEvents();
 
   /*! \brief Helper method to determine how to handle TMSG_SHUTDOWN
   */

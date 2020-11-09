@@ -9,6 +9,7 @@
 #include "SkinBuiltins.h"
 
 #include "Application.h"
+#include "ApplicationRendering.h"
 #include "MediaSource.h"
 #include "ServiceBroker.h"
 #include "URL.h"
@@ -37,8 +38,8 @@ using namespace ADDON;
 static int ReloadSkin(const std::vector<std::string>& params)
 {
   //  Reload the skin
-  g_application.ReloadSkin(!params.empty() &&
-                           StringUtils::EqualsNoCase(params[0], "confirm"));
+  g_applicationRendering.ReloadSkin(!params.empty() &&
+                                    StringUtils::EqualsNoCase(params[0], "confirm"));
 
   return 0;
 }
@@ -48,7 +49,7 @@ static int ReloadSkin(const std::vector<std::string>& params)
  */
 static int UnloadSkin(const std::vector<std::string>& params)
 {
-  g_application.UnloadSkin();
+  g_applicationRendering.UnloadSkin();
 
   return 0;
 }
@@ -374,7 +375,7 @@ static int SetTheme(const std::vector<std::string>& params)
   if (StringUtils::EqualsNoCase(colorTheme, "Textures.xml"))
     colorTheme = "defaults.xml";
   settings->SetString(CSettings::SETTING_LOOKANDFEEL_SKINCOLORS, colorTheme);
-  g_application.ReloadSkin();
+  g_applicationRendering.ReloadSkin();
 
   return 0;
 }

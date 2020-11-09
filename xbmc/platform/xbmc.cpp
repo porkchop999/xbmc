@@ -19,6 +19,7 @@
 #endif
 
 #include "AppParamParser.h"
+#include "ApplicationRendering.h"
 #include "commons/Exception.h"
 #include "platform/MessagePrinter.h"
 #include "utils/log.h"
@@ -37,18 +38,26 @@ extern "C" int XBMC_Run(const CAppParamParser& params)
   CXBMCApp::get()->Initialize();
 #endif
 
-  if (!params.m_headless && !g_application.CreateGUI())
-  {
-    CMessagePrinter::DisplayError("ERROR: Unable to create GUI. Exiting");
-    g_application.Stop(EXITCODE_QUIT);
-    g_application.Cleanup();
-    return status;
-  }
+  if (!params.m_headless)
+    g_applicationRendering.Start(params);
+
+  // if (!params.m_headless && !g_applicationRendering.CreateGUI(params))
+  // {
+  //   g_application.Stop(EXITCODE_QUIT);
+  //   g_application.Cleanup();
+  //   return status;
+  // }
+
   if (!g_application.Initialize())
   {
     CMessagePrinter::DisplayError("ERROR: Unable to Initialize. Exiting");
     return status;
   }
+
+  // {
+  // CMessagePrinter::DisplayError("ERROR: Unable to Initialize Rendering. Exiting");
+  // return status;
+  // }
 
 #ifdef TARGET_WINDOWS_DESKTOP
   Microsoft::WRL::ComPtr<IMMDeviceEnumerator> pEnumerator = nullptr;
@@ -63,6 +72,8 @@ extern "C" int XBMC_Run(const CAppParamParser& params)
 #endif
 
   status = g_application.Run(params);
+
+  g_applicationRendering.CleanUp();
 
 #ifdef TARGET_WINDOWS_DESKTOP
   // the end

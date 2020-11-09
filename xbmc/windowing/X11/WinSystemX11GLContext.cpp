@@ -9,6 +9,7 @@
 #include "WinSystemX11GLContext.h"
 
 #include "Application.h"
+#include "ApplicationRendering.h"
 #include "GLContextEGL.h"
 #include "OptionalsReg.h"
 #include "VideoSyncOML.h"
@@ -152,7 +153,7 @@ bool CWinSystemX11GLContext::ResizeWindow(int newWidth, int newHeight, int newLe
   CRenderSystemGL::ResetRenderSystem(newWidth, newHeight);
 
   if (m_newGlContext)
-    g_application.ReloadSkin();
+    g_applicationRendering.ReloadSkin();
 
   return true;
 }
@@ -164,7 +165,7 @@ void CWinSystemX11GLContext::FinishWindowResize(int newWidth, int newHeight)
   CRenderSystemGL::ResetRenderSystem(newWidth, newHeight);
 
   if (m_newGlContext)
-    g_application.ReloadSkin();
+    g_applicationRendering.ReloadSkin();
 }
 
 bool CWinSystemX11GLContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
@@ -174,7 +175,7 @@ bool CWinSystemX11GLContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res
   CRenderSystemGL::ResetRenderSystem(res.iWidth, res.iHeight);
 
   if (m_newGlContext)
-    g_application.ReloadSkin();
+    g_applicationRendering.ReloadSkin();
 
   return true;
 }

@@ -62,22 +62,9 @@ int CXBApplicationEx::Run(const CAppParamParser &params)
     lastFrameTime = XbmcThreads::SystemClockMillis();
     Process();
 
-    if (!m_bStop)
-    {
-      FrameMove(true, m_renderGUI);
-    }
-
-    if (m_renderGUI && !m_bStop)
-    {
-      Render();
-    }
-    else if (!m_renderGUI)
-    {
-      frameTime = XbmcThreads::SystemClockMillis() - lastFrameTime;
-      if(frameTime < noRenderFrameTime)
-        KODI::TIME::Sleep(noRenderFrameTime - frameTime);
-    }
-
+    frameTime = XbmcThreads::SystemClockMillis() - lastFrameTime;
+    if (frameTime < noRenderFrameTime)
+      KODI::TIME::Sleep(noRenderFrameTime - frameTime);
   }
   Destroy();
 

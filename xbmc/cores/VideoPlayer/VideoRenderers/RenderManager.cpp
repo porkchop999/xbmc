@@ -9,6 +9,7 @@
 #include "RenderManager.h"
 
 #include "Application.h"
+#include "ApplicationRendering.h"
 #include "RenderCapture.h"
 #include "RenderFactory.h"
 #include "RenderFlags.h"
@@ -1027,7 +1028,7 @@ int CRenderManager::WaitForBuffer(volatile std::atomic_bool&bStop, int timeout)
 
   // check if gui is active and discard buffer if not
   // this keeps videoplayer going
-  if (!m_bRenderGUI || !g_application.GetRenderGUI())
+  if (!m_bRenderGUI || !g_applicationRendering.GetRenderGUI())
   {
     m_bRenderGUI = false;
     double presenttime = 0;

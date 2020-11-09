@@ -1,6 +1,7 @@
 set(SOURCES Application.cpp
             AppInboundProtocol.cpp
             ApplicationPlayer.cpp
+            ApplicationRendering.cpp
             ApplicationStackHelper.cpp
             AppParamParser.cpp
             AutoSwitch.cpp
@@ -42,6 +43,7 @@ set(HEADERS AppParamParser.h
             Application.h
             AppInboundProtocol.h
             ApplicationPlayer.h
+            ApplicationRendering.h
             ApplicationStackHelper.h
             AutoSwitch.h
             BackgroundInfoLoader.h

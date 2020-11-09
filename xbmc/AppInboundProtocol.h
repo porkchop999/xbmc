@@ -10,15 +10,15 @@
 
 #include "windowing/XBMC_events.h"
 
-class CApplication;
+class CApplicationRendering;
 
 class CAppInboundProtocol
 {
 public:
-  CAppInboundProtocol(CApplication &app);
+  CAppInboundProtocol(CApplicationRendering& app);
   bool OnEvent(XBMC_Event &event);
   void SetRenderGUI(bool renderGUI);
 
 protected:
-  CApplication &m_pApp;
+  CApplicationRendering& m_pApp;
 };

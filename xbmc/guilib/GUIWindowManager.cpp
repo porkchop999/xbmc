@@ -9,6 +9,7 @@
 #include "GUIWindowManager.h"
 
 #include "Application.h"
+#include "ApplicationRendering.h"
 #include "GUIAudioManager.h"
 #include "GUIDialog.h"
 #include "GUIInfoManager.h"
@@ -747,7 +748,7 @@ void CGUIWindowManager::ForceActivateWindow(int iWindowID, const std::string& st
 
 void CGUIWindowManager::ActivateWindow(int iWindowID, const std::vector<std::string>& params, bool swappingWindows /* = false */, bool force /* = false */)
 {
-  if (!g_application.IsCurrentThread())
+  if (!g_applicationRendering.IsCurrentThread())
   {
     // make sure graphics lock is not held
     CSingleExit leaveIt(CServiceBroker::GetWinSystem()->GetGfxContext());
@@ -1094,7 +1095,7 @@ bool RenderOrderSortFunction(CGUIWindow *first, CGUIWindow *second)
 
 void CGUIWindowManager::Process(unsigned int currentTime)
 {
-  assert(g_application.IsCurrentThread());
+  assert(g_applicationRendering.IsCurrentThread());
   CSingleLock lock(CServiceBroker::GetWinSystem()->GetGfxContext());
 
   m_dirtyregions.clear();
@@ -1175,7 +1176,7 @@ void CGUIWindowManager::RenderEx() const
 
 bool CGUIWindowManager::Render()
 {
-  assert(g_application.IsCurrentThread());
+  assert(g_applicationRendering.IsCurrentThread());
   CSingleExit lock(CServiceBroker::GetWinSystem()->GetGfxContext());
 
   CDirtyRegionList dirtyRegions = m_tracker.GetDirtyRegions();
@@ -1246,7 +1247,7 @@ void CGUIWindowManager::AfterRender()
 
 void CGUIWindowManager::FrameMove()
 {
-  assert(g_application.IsCurrentThread());
+  assert(g_applicationRendering.IsCurrentThread());
   CSingleLock lock(CServiceBroker::GetWinSystem()->GetGfxContext());
 
   if(m_iNested == 0)
@@ -1300,17 +1301,17 @@ bool CGUIWindowManager::ProcessRenderLoop(bool renderOnly)
 {
   bool renderGui = true;
 
-  if (g_application.IsCurrentThread() && m_pCallback)
+  if (g_applicationRendering.IsCurrentThread() && m_pCallback)
   {
     renderGui = m_pCallback->GetRenderGUI();
     m_iNested++;
     if (!renderOnly)
-      m_pCallback->Process();
+      m_pCallback->ProcessCallBack();
     m_pCallback->FrameMove(!renderOnly);
     m_pCallback->Render();
     m_iNested--;
   }
-  if (g_application.m_bStop || !renderGui)
+  if (g_applicationRendering.IsStopping() || !renderGui)
     return false;
   else
     return true;

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "guilib/IWindowManagerCallback.h"
-
 class CAppParamParser;
 
 // Do not change the numbering, external scripts depend on them
@@ -20,11 +18,11 @@ enum {
   EXITCODE_REBOOT    = 66,
 };
 
-class CXBApplicationEx : public IWindowManagerCallback
+class CXBApplicationEx
 {
 public:
   CXBApplicationEx();
-  ~CXBApplicationEx() override;
+  ~CXBApplicationEx();
 
   // Variables for timing
   bool m_bStop;
@@ -35,6 +33,8 @@ public:
   // Overridable functions for the 3D scene created by the app
   virtual bool Initialize() { return true; }
   virtual bool Cleanup() { return true; }
+
+  virtual void Process() = 0;
 
 public:
   int Run(const CAppParamParser &params);

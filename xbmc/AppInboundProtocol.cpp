@@ -8,9 +8,9 @@
 
 #include "AppInboundProtocol.h"
 
-#include "Application.h"
+#include "ApplicationRendering.h"
 
-CAppInboundProtocol::CAppInboundProtocol(CApplication &app) : m_pApp(app)
+CAppInboundProtocol::CAppInboundProtocol(CApplicationRendering& app) : m_pApp(app)
 {
 
 }

@@ -245,15 +245,15 @@ do { \
  \ingroup winmsg
  \brief Set the label of the current control
  */
-#define SET_CONTROL_LABEL_THREAD_SAFE(controlID,label) \
-{ \
- CGUIMessage msg(GUI_MSG_LABEL_SET, GetID(), controlID); \
- msg.SetLabel(label); \
- if(g_application.IsCurrentThread()) \
-   OnMessage(msg); \
- else \
-   CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg, GetID()); \
-}
+#define SET_CONTROL_LABEL_THREAD_SAFE(controlID, label) \
+  { \
+    CGUIMessage msg(GUI_MSG_LABEL_SET, GetID(), controlID); \
+    msg.SetLabel(label); \
+    if (g_applicationRendering.IsCurrentThread()) \
+      OnMessage(msg); \
+    else \
+      CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg, GetID()); \
+  }
 
 /*!
  \ingroup winmsg

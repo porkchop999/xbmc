@@ -346,9 +346,13 @@ static int PlayerControl(const std::vector<std::string>& params)
         CServiceBroker::GetSettingsComponent()->GetSettings()->Save();
     }
 
-    // send messages so now playing window can get updated
-    CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_REPEAT, 0, 0, iPlaylist, (int)state);
-    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
+    auto gui = CServiceBroker::GetGUI();
+    if (gui)
+    {
+      // send messages so now playing window can get updated
+      CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_REPEAT, 0, 0, iPlaylist, (int)state);
+      gui->GetWindowManager().SendThreadMessage(msg);
+    }
   }
   else if (StringUtils::StartsWithNoCase(params[0], "resumelivetv"))
   {
@@ -404,12 +408,15 @@ static int PlayMedia(const std::vector<std::string>& params)
   if (URIUtils::HasSlashAtEnd(params[0]))
     item.m_bIsFolder = true;
 
+  int activeWindow;
+  auto gui = CServiceBroker::GetGUI();
+  if (gui)
+    activeWindow = gui->GetWindowManager().GetActiveWindow();
+
   // restore to previous window if needed
-  if( CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_SLIDESHOW ||
-      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO ||
-      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_FULLSCREEN_GAME ||
-      CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow() == WINDOW_VISUALISATION )
-    CServiceBroker::GetGUI()->GetWindowManager().PreviousWindow();
+  if (gui && (activeWindow == WINDOW_SLIDESHOW || activeWindow == WINDOW_FULLSCREEN_VIDEO ||
+              activeWindow == WINDOW_FULLSCREEN_GAME || activeWindow == WINDOW_VISUALISATION))
+    gui->GetWindowManager().PreviousWindow();
 
   // reset screensaver
   g_application.ResetScreenSaver();
