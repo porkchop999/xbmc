@@ -55,6 +55,7 @@ public:
     return raw;
   }
 
+  void Reset() { m_initialized = false; }
   void SetInitialized() { m_initialized = true; }
   bool IsInitialized() { return m_initialized; }
 
