@@ -154,28 +154,126 @@ using Matrix4 = CMatrix<4>;
 using Matrix3 = CMatrix<3>;
 using Matrix3x1 = std::array<float, 3>;
 
+/**
+ * @brief Helper class used for YUV to RGB conversions. This class can
+ *        take into account different source/destination primaries and
+ *        various other parameters.
+ *
+ */
 class CConvertMatrix
 {
 public:
   CConvertMatrix() = default;
   virtual ~CConvertMatrix() = default;
 
+  /**
+   * @brief Set the source color space.
+   *
+   * @param colorSpace
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetSourceColorSpace(AVColorSpace colorSpace);
+
+  /**
+   * @brief Set the source bit depth.
+   *
+   * @param bits
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetSourceBitDepth(int bits);
+
+  /**
+   * @brief Set the source limited range boolean.
+   *
+   * @param limited
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetSourceLimitedRange(bool limited);
+
+  /**
+   * @brief Set the source texture bit depth. This is need to normalize values
+   *        when using > 8 bit texture formats in OpenGL/DirectX. For example
+   *        GL_R16 is a 16 bit texture which needs to normalize the 10 bit format.
+   *
+   * @param textureBits
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetSourceTextureBitDepth(int textureBits);
+
+  /**
+   * @brief Set the source color primaries.
+   *
+   * @param src
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetSourceColorPrimaries(AVColorPrimaries src);
 
+  /**
+   * @brief Set the destination color primaries.
+   *
+   * @param dst
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetDestinationColorPrimaries(AVColorPrimaries dst);
+
+  /**
+   * @brief Set the destination contrast.
+   *
+   * @param contrast
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetDestinationContrast(float contrast);
+
+  /**
+   * @brief Set the destination black level.
+   *
+   * @param black
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetDestinationBlack(float black);
+
+  /**
+   * @brief Set the destination limited range boolean.
+   *
+   * @param limited
+   * @return CConvertMatrix&
+   */
   CConvertMatrix& SetDestinationLimitedRange(bool limited);
 
+  /**
+   * @brief Get the YUV Matrix for the YUV to RGB conversion.
+   *
+   * @return Matrix4
+   */
   Matrix4 GetYuvMat();
+
+  /**
+   * @brief Get the Primaries Matrix for the primaries conversion.
+   *
+   * @return Matrix3
+   */
   Matrix3 GetPrimMat();
+
+  /**
+   * @brief Get the gamma source value. Used for color primary conversion..
+   *
+   * @return float
+   */
   float GetGammaSrc();
+
+  /**
+   * @brief Get the gamma destination value. Used for color primary conversion.
+   *
+   * @return float
+   */
   float GetGammaDst();
 
+  /**
+   * @brief Get the YUV coeffecients used for tonemapping.
+   *
+   * @param colspace
+   * @return Matrix3x1
+   */
   static Matrix3x1 GetRGBYuvCoefs(AVColorSpace colspace);
 
 protected:
