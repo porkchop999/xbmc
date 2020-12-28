@@ -9,6 +9,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <memory>
 
 extern "C" {
@@ -21,7 +22,7 @@ class CMatrix
 public:
   CMatrix() = default;
   CMatrix(CMatrix<Order - 1>& other);
-  CMatrix(std::array<std::array<float, Order>, Order>& other);
+  CMatrix(std::array<std::array<float, Order>, Order>& other) { m_mat = other; }
   CMatrix(std::array<std::array<float, Order - 1>, Order - 1>& other);
   virtual ~CMatrix() = default;
 
@@ -31,6 +32,27 @@ public:
   CMatrix operator*=(const CMatrix& other);
 
   CMatrix& operator=(const std::array<std::array<float, Order - 1>, Order - 1>& other);
+
+  bool operator==(const CMatrix<Order>& other) const
+  {
+    for (unsigned i = 0; i < Order; ++i)
+    {
+      for (unsigned j = 0; j < Order; ++j)
+      {
+        if (m_mat[i][j] == other.m_mat[i][j])
+          continue;
+
+        // some floating point comparisions should be done by checking if the difference is within a tolerance
+        if (std::abs(m_mat[i][j] - other.m_mat[i][j]) <=
+            (std::max(std::abs(other.m_mat[i][j]), std::abs(m_mat[i][j])) * 1e-2))
+          continue;
+
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   std::array<float, Order>& operator[](int index) { return m_mat[index]; }
 

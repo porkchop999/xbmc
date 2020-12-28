@@ -117,12 +117,6 @@ float CalculateDeterminant<2>(const std::array<std::array<float, 2>, 2>& src)
 //------------------------------------------------------------------------------
 
 template<unsigned Order>
-CMatrix<Order>::CMatrix(std::array<std::array<float, Order>, Order>& other)
-{
-  m_mat = other;
-}
-
-template<unsigned Order>
 CMatrix<Order>::CMatrix(std::array<std::array<float, Order - 1>, Order - 1>& other)
 {
   *this = other;
